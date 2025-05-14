@@ -47,8 +47,8 @@ jobs:
         run: |
           echo "Including libraries:"
           for lib in ${{ matrix.program.lib }}; do
-            echo " - lib/$(lib)/src/*"
-            mv lib/$(lib)/src/* ${{ matrix.program.src }}
+            echo " - lib/$lib/src/*"
+            mv lib/$lib/src/* ${{ matrix.program.src }}
           done
 
       - name: Gather other application resources
