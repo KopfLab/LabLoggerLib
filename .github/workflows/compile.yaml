@@ -47,11 +47,15 @@ jobs:
           device-os-version: ${{ matrix.platform.version }}
           sources-folder: ${{ matrix.program.src }}
 
-      - name: Upload artifact
+      - name: Rename binary
+        run: |
+          mv ${{ steps.compile.outputs.firmware-path }} ${{ matrix.program.src }}/${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}.bin
+
+      - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
-          path: ${{ steps.compile.outputs.firmware-path }}
+          path: ${{ matrix.program.src }}
 
       - name: Compile locally to debug
         if: ${{ failure() }}
