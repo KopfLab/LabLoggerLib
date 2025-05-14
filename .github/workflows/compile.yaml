@@ -39,7 +39,7 @@ jobs:
           echo "Moving application sources"
           mv ${{ matrix.root }}/${{ matrix.program.src }}/* ${{ matrix.program.src }}
           echo "Moving application libraries"
-          for lib in "${{ matrix.program.lib }}"; do
+          for lib in ${{ matrix.program.lib }}; do
             echo "$lib"
             mv $lib/src/* ${{ matrix.program.src }}
           done
