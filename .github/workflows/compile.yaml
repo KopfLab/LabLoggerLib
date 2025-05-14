@@ -23,7 +23,7 @@ jobs:
         root:
           - 'test'
         program:
-          - {src: 'blink', lib: 'lib/Mylib/src'}  
+          - {src: 'blink', lib: 'lib/MyLib/src'}  
 
     steps:
       - name: Checkout code
