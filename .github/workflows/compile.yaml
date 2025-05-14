@@ -18,16 +18,19 @@ jobs:
       matrix:
         platform: 
           - {name: 'p2', version: '6.3.2'}
-          - {name: 'argon', version: '4.2.0'}
-          - {name: 'photon', version: '2.3.1'}
+#          - {name: 'argon', version: '4.2.0'}
+#          - {name: 'photon', version: '2.3.1'}
         root:
           - 'test'
         program:
-          - {src: 'blink', lib: 'lib/MyLib/src'}  
+#          - {src: 'blink', lib: 'lib/MyLib/src'}  
+          - {src: 'blink', lib: 'lib/DeviceNameHelperRK/src'}  
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive 
 
       - name: Gather application sources 
         run: |
@@ -47,7 +50,7 @@ jobs:
           device-os-version: ${{ matrix.platform.version }}
           sources-folder: ${{ matrix.program.src }}
 
-      - name: Rename binary
+      - name: Move binary
         run: |
           mv ${{ steps.compile.outputs.firmware-path }} ${{ matrix.program.src }}/${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}.bin
 
@@ -63,4 +66,4 @@ jobs:
         with:
           particle-platform-name: ${{ matrix.platform.name }}
           device-os-version: ${{ matrix.platform.version }}
-          sources-folder: 'appsrc'
+          sources-folder: ${{ matrix.program.src }}
