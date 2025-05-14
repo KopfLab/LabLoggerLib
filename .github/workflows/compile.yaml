@@ -10,6 +10,17 @@ on:
 jobs:
   compile:
     runs-on: ubuntu-latest
+
+    name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: 
+          - {name: 'p2', version: '6.3.2'}
+        program:
+          - {src: 'blink', lib: 'libs/Mylib/src'}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,32 +28,31 @@ jobs:
       - name: Gather application sources 
         run: |
           echo "Creating temporary source directory"
-          mkdir appsrc
+          mkdir ${{ matrix.program.src }}
           echo "Moving application sources"
-          mv test/blink/* appsrc
+          mv tests/${{ matrix.program.src }}/* ${{ matrix.program.src }}
           echo "Moving application libraries"
-          mv lib/DeviceNameHelperRK/src/* appsrc
+          mv ${{ matrix.program.lib }}/* ${{ matrix.program.src }}
 
       - name: Compile in cloud
         id: compile
         uses: particle-iot/compile-action@v1
         with:
           particle-access-token: ${{ secrets.PARTICLE_ACCESS_TOKEN }}
-          particle-platform-name: 'p2'
-          device-os-version: '6.3.2'
-          sources-folder: 'appsrc'
+          particle-platform-name: ${{ matrix.platform.name }}
+          device-os-version: ${{ matrix.platform.version }}
+          sources-folder: ${{ matrix.program.src }}
 
       - name: Upload artifact
-        if: ${{ success() }}
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-artifact
+          name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
           path: ${{ steps.compile.outputs.firmware-path }}
 
       - name: Compile locally to debug
         if: ${{ failure() }}
         uses: particle-iot/compile-action@v1
         with:
-          particle-platform-name: 'p2'
-          device-os-version: '6.3.2'
+          particle-platform-name: ${{ matrix.platform.name }}
+          device-os-version: ${{ matrix.platform.version }}
           sources-folder: 'appsrc'
