@@ -26,8 +26,8 @@ jobs:
           - src: 'blink'
             lib: 'DeviceNameHelperRK MyLib'
           - src: 'publish'
-            lib: 'DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
-            other: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
+            lib: 'LoggerCore DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
+#            other: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
 
     steps:
       - name: Checkout code
@@ -47,8 +47,13 @@ jobs:
         run: |
           echo "Including libraries:"
           for lib in ${{ matrix.program.lib }}; do
-            echo " - lib/$lib/src/*"
-            mv lib/$lib/src/* ${{ matrix.program.src }}
+            if [ -d "lib/$lib" ]; then
+              echo " - lib/$lib/src/*"
+              mv lib/$lib/src/* ${{ matrix.program.src }}
+            else
+              echo " - could not find $lib, make sure the library exists"
+              exit 1
+            fi
           done
 
       - name: Gather other application resources
@@ -57,6 +62,7 @@ jobs:
           echo "Including other resources:"
           for other in ${{ matrix.program.other }}; do
             echo " - $other"
+            find $other -name '*.pdf' -exec mv -t pdfs {} +
             mv $other ${{ matrix.program.src }}
           done
 
