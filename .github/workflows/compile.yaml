@@ -14,6 +14,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Gather application sources 
+        run: |
+          mkdir appsrc
+          mv test/blink/* appsrc
+          mv lib/MyLib/src/* appsrc
+
       - name: Compile application
         id: compile
         uses: particle-iot/compile-action@v1
@@ -21,7 +27,7 @@ jobs:
           particle-access-token: ${{ secrets.PARTICLE_ACCESS_TOKEN }}
           particle-platform-name: 'p2'
           device-os-version: '6.3.2'
-          sources-folder: 'test/blink'
+          sources-folder: 'appsrc'
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
