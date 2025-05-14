@@ -18,6 +18,8 @@ jobs:
       matrix:
         platform: 
           - {name: 'p2', version: '6.3.2'}
+        root:
+          - 'test'
         program:
           - {src: 'blink', lib: 'libs/Mylib/src'}
 
@@ -30,7 +32,7 @@ jobs:
           echo "Creating temporary source directory"
           mkdir ${{ matrix.program.src }}
           echo "Moving application sources"
-          mv tests/${{ matrix.program.src }}/* ${{ matrix.program.src }}
+          mv ${{ matrix.root }}/${{ matrix.program.src }}/* ${{ matrix.program.src }}
           echo "Moving application libraries"
           mv ${{ matrix.program.lib }}/* ${{ matrix.program.src }}
 
