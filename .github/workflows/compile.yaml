@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - test/**
+      - Logger*/**
       - .github/workflows/compile.yaml
 
 jobs:
@@ -20,8 +21,6 @@ jobs:
           - {name: 'p2', version: '6.3.2'}
 #          - {name: 'argon', version: '4.2.0'}
 #          - {name: 'photon', version: '2.3.1'}
-        root:
-          - 'test'
         program:
           - src: 'blink'
             lib: 'DeviceNameHelperRK MyLib'
@@ -41,8 +40,8 @@ jobs:
         run: |
           echo "Creating temporary source directory"
           mkdir ${{ matrix.program.src }}
-          echo "Including sources from ${{ matrix.root }}/${{ matrix.program.src }}"
-          mv ${{ matrix.root }}/${{ matrix.program.src }}/* ${{ matrix.program.src }} 
+          echo "Including sources from test/${{ matrix.program.src }}"
+          mv test/${{ matrix.program.src }}/* ${{ matrix.program.src }} 
           echo "Including libraries:"
           for lib in ${{ matrix.program.lib }}; do
             if [ -d "$lib" ]; then
