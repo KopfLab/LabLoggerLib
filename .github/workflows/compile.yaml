@@ -14,7 +14,7 @@ jobs:
         uses: particle-iot/compile-action@v1
         with:
           particle-platform-name: 'boron'
-          device-os-version: 'latest-lts'
+          device-os-version: '4.2.0'
           sources-folder: 'test/blink'
           particle-access-token: ${{ secrets.PARTICLE_ACCESS_TOKEN }}
 

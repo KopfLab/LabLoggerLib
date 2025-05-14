@@ -1,4 +1,3 @@
-#include "application.h"
 #include "Particle.h"
 
 // generic blink test
