@@ -26,8 +26,10 @@ jobs:
           - src: 'blink'
             lib: 'DeviceNameHelperRK MyLib'
           - src: 'publish'
-            lib: 'LoggerCore DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
-#            other: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
+            lib: 'DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
+            aux: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
+          - src: 'controller'
+            lib: 'LoggerCore'
 
     steps:
       - name: Checkout code
@@ -41,29 +43,22 @@ jobs:
           mkdir ${{ matrix.program.src }}
           echo "Including sources from ${{ matrix.root }}/${{ matrix.program.src }}"
           mv ${{ matrix.root }}/${{ matrix.program.src }}/* ${{ matrix.program.src }} 
-
-      - name: Gather application libraries
-        if: contains(${{ matrix.program }}, 'lib')
-        run: |
           echo "Including libraries:"
           for lib in ${{ matrix.program.lib }}; do
-            if [ -d "lib/$lib" ]; then
+            if [ -d "$lib" ]; then
+              echo " - $lib/src/*"
+              mv $lib/src/* ${{ matrix.program.src }}
+            elif [ -d "lib/$lib" ]; then
               echo " - lib/$lib/src/*"
               mv lib/$lib/src/* ${{ matrix.program.src }}
             else
               echo " - could not find $lib, make sure the library exists"
-              exit 1
             fi
           done
-
-      - name: Gather other application resources
-        if: contains(${{ matrix.program }}, 'other')
-        run: |
-          echo "Including other resources:"
-          for other in ${{ matrix.program.other }}; do
-            echo " - $other"
-            find $other -name '*.pdf' -exec mv -t pdfs {} +
-            mv $other ${{ matrix.program.src }}
+          echo "Including auxiliary resources:"
+          for aux in ${{ matrix.program.aux }}; do
+            echo " - $aux"
+            mv $aux ${{ matrix.program.src }}
           done
 
       - name: Compile in cloud
