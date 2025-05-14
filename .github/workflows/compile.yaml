@@ -24,7 +24,7 @@ jobs:
           - 'test'
         program:
 #          - {src: 'blink', lib: 'lib/MyLib/src'}  
-          - {src: 'blink', lib: 'lib/DeviceNameHelperRK/src'}  
+          - {src: 'blink', lib: 'lib/DeviceNameHelperRK lib/MyLib'}  
 
     steps:
       - name: Checkout code
@@ -39,7 +39,10 @@ jobs:
           echo "Moving application sources"
           mv ${{ matrix.root }}/${{ matrix.program.src }}/* ${{ matrix.program.src }}
           echo "Moving application libraries"
-          mv ${{ matrix.program.lib }}/* ${{ matrix.program.src }}
+          for lib in "${{ matrix.program.lib }}"; do
+            echo "$lib"
+            mv $lib/src/* ${{ matrix.program.src }}
+          done
 
       - name: Compile in cloud
         id: compile
