@@ -18,10 +18,12 @@ jobs:
       matrix:
         platform: 
           - {name: 'p2', version: '6.3.2'}
+          - {name: 'argon', version: '4.2.0'}
+          - {name: 'photon', version: '2.3.1'}
         root:
           - 'test'
         program:
-          - {src: 'blink', lib: 'libs/Mylib/src'}
+          - {src: 'blink', lib: 'lib/Mylib/src'}  
 
     steps:
       - name: Checkout code
