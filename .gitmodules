@@ -1,3 +1,15 @@
 [submodule "lib/DeviceNameHelperRK"]
 	path = lib/DeviceNameHelperRK
 	url = https://github.com/rickkas7/DeviceNameHelperRK.git
+[submodule "lib/FileHelperRK"]
+	path = lib/FileHelperRK
+	url = https://github.com/rickkas7/FileHelperRK.git
+[submodule "lib/SequentialFileRK"]
+	path = lib/SequentialFileRK
+	url = https://github.com/rickkas7/SequentialFileRK.git
+[submodule "lib/PublishQueueExtRK"]
+	path = lib/PublishQueueExtRK
+	url = https://github.com/rickkas7/PublishQueueExtRK.git
+[submodule "lib/SparkFun_Qwiic_OpenLog_Arduino_Library"]
+	path = lib/SparkFun_Qwiic_OpenLog_Arduino_Library
+	url = https://github.com/sparkfun/SparkFun_Qwiic_OpenLog_Arduino_Library.git
