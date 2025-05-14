@@ -23,8 +23,11 @@ jobs:
         root:
           - 'test'
         program:
-#          - {src: 'blink', lib: 'lib/MyLib/src'}  
-          - {src: 'blink', lib: 'lib/DeviceNameHelperRK lib/MyLib'}  
+          - src: 'blink'
+            lib: 'DeviceNameHelperRK MyLib'
+          - src: 'publish'
+            lib: 'DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
+            other: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
 
     steps:
       - name: Checkout code
@@ -36,12 +39,25 @@ jobs:
         run: |
           echo "Creating temporary source directory"
           mkdir ${{ matrix.program.src }}
-          echo "Moving application sources"
-          mv ${{ matrix.root }}/${{ matrix.program.src }}/* ${{ matrix.program.src }}
-          echo "Moving application libraries"
+          echo "Including sources from ${{ matrix.root }}/${{ matrix.program.src }}"
+          mv ${{ matrix.root }}/${{ matrix.program.src }}/* ${{ matrix.program.src }} 
+
+      - name: Gather application libraries
+        if: contains(${{ matrix.program }}, 'lib')
+        run: |
+          echo "Including libraries:"
           for lib in ${{ matrix.program.lib }}; do
-            echo "$lib"
-            mv $lib/src/* ${{ matrix.program.src }}
+            echo " - lib/$(lib)/src/*"
+            mv lib/$(lib)/src/* ${{ matrix.program.src }}
+          done
+
+      - name: Gather other application resources
+        if: contains(${{ matrix.program }}, 'other')
+        run: |
+          echo "Including other resources:"
+          for other in ${{ matrix.program.other }}; do
+            echo " - $other"
+            mv $other ${{ matrix.program.src }}
           done
 
       - name: Compile in cloud
