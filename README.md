@@ -1,10 +1,13 @@
+![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main) 
+![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main)
+
 # LabLoggerLibs
 
 This repository holds a collection of code libraries for ***LabLogger*** devices. All content of this repository is free to use for noncommercial research and development efforts as outlined in the terms of the included [LICENSE file](LICENSE.md).
 
 To cite the use of ***LabLogger*** libraries and devices in publications, use:
 
-> Kopf S, 2025. _LabLogger: modular data logging for research labs_. <https://github.com/KopfLab/LabLoggerLibs>
+> Kopf S, 2025. _LabLogger: modular data logging for research labs_. <span>https://github.com/KopfLab/LabLoggerLibs<span>
 
 A BibTeX entry for LaTeX users is
 
@@ -22,10 +25,10 @@ A BibTeX entry for LaTeX users is
 
 The following firmware is included in the repository to provide frequently used stand-alone tests for ***LabLogger*** devices and individual ***LabLogger*** components. The build status is based on automated cloud compile in the `Main` and `dev` branches.
 
-| Program  | Main | dev |
-| -------- | ---- | --- |
-| blink    | ![blink](https://github.com/KopfLab/LabLoggerLib/actions/workflows/compile-blink.yaml/badge.svg) | ![blink-dev](https://github.com/KopfLab/LabLoggerLib/actions/workflows/compile-blink.yaml/badge.svg?branch=dev) |
-| publish  | ![publish](https://github.com/KopfLab/LabLoggerLib/actions/workflows/compile-publish.yaml/badge.svg) | ![publish-dev](https://github.com/KopfLab/LabLoggerLib/actions/workflows/compile-publish.yaml/badge.svg?branch=dev) |
+| Program  | main | dev  |
+| :------- | ---: | ---: |
+| blink    | ![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main) | ![blink-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=dev) |
+| publish  | ![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main) | ![publish-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=dev) |
 
 To generate binaries for these programs:
 
