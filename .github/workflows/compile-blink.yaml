@@ -1,5 +1,7 @@
+# name of the job
 name: Compile blink
 
+# specify which paths to watch for changes
 on:
   workflow_dispatch:  
   push:
@@ -8,21 +10,27 @@ on:
       - .github/workflows/compile.yaml
       - .github/workflows/compile-blink.yaml
 
+# run compile via the compile.yaml
 jobs:
   compile:
-    # define program and platrosm
     strategy:
       fail-fast: false
       matrix:
+        # CHANGE program/lib/aux as needed
         program:
           - src: 'blink'
             lib: 'DeviceNameHelperRK MyLib'
+            aux: ''
+        # CHANGE platforms as needed
         platform: 
           - {name: 'p2', version: '6.3.2'}
           - {name: 'photon', version: '2.3.1'}
-#          - {name: 'argon', version: '4.2.0'}
+          - {name: 'argon', version: '4.2.0'}
 
-    # use the compile workflow (do not change)
+    # program name
+    name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+
+    # workflow call
     uses: ./.github/workflows/compile.yaml
     with:
       platform: ${{ matrix.platform.name }}
@@ -30,16 +38,3 @@ jobs:
       src: ${{ matrix.program.src }}
       lib: ${{ matrix.program.lib }}
       aux: ${{ matrix.program.aux }}
-
-    # program name (do not change)
-    name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
-
-            
-#        program:
-#          - src: 'blink'
-#            lib: 'DeviceNameHelperRK MyLib'
-#          - src: 'publish'
-#            lib: 'DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
-#            aux: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
-#          - src: 'controller'
-#            lib: 'LoggerCore DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
