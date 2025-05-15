@@ -4,37 +4,35 @@ on:
   workflow_dispatch:  
   push:
     paths:
-      - src/${{ env.program }}
+      - src/blink
       - .github/workflows/compile.yaml
-      - .github/workflows/compile-${{ env.program }}.yaml
-
-env:
-  mascot: Mona
-  super_duper_var: totally_awesome
-  program: 'blink'
-  lib: 'DeviceNameHelperRK MyLib'
+      - .github/workflows/compile-blink.yaml
 
 jobs:
   compile:
-    # define which platforms to compile for
+    # define program and platrosm
     strategy:
       fail-fast: false
       matrix:
+        program:
+          - src: 'blink'
+            lib: 'DeviceNameHelperRK MyLib'
         platform: 
           - {name: 'p2', version: '6.3.2'}
           - {name: 'photon', version: '2.3.1'}
 #          - {name: 'argon', version: '4.2.0'}
 
-    # use the compile workflow
+    # use the compile workflow (do not change)
     uses: ./.github/workflows/compile.yaml
     with:
       platform: ${{ matrix.platform.name }}
       version: ${{ matrix.platform.version }}
-      src: ${{ env.program }}
-      lib: ${{ env.lib }}
+      src: ${{ matrix.program.src }}
+      lib: ${{ matrix.program.lib }}
+      aux: ${{ matrix.program.aux }}
 
-    # program name
-    name: ${{ env.program }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+    # program name (do not change)
+    name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
 
             
 #        program:
