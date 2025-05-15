@@ -1,17 +1,21 @@
 # set the program and libs
-env:
-  PROGRAM: 'blink'
-  LIB: 'DeviceNameHelperRK MyLib'
 
-name: Compile $PROGRAM
+
+name: Compile ${{ env.program }}
 
 on:
   workflow_dispatch:  
   push:
     paths:
-      - src/$PROGRAM
+      - src/${{ env.program }}
       - .github/workflows/compile.yaml
-      - .github/workflows/compile-$PROGRAM.yaml
+      - .github/workflows/compile-${{ env.program }}.yaml
+
+env:
+  mascot: Mona
+  super_duper_var: totally_awesome
+  program: 'blink'
+  lib: 'DeviceNameHelperRK MyLib'
 
 jobs:
   compile:
@@ -29,11 +33,11 @@ jobs:
     with:
       platform: ${{ matrix.platform.name }}
       version: ${{ matrix.platform.version }}
-      src: $PROGRAM
-      lib: $LIB
+      src: ${{ env.program }}
+      lib: ${{ env.lib }}
 
     # program name
-    name: $PROGRAM-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+    name: ${{ env.program }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
 
             
 #        program:
