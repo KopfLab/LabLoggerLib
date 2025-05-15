@@ -24,7 +24,7 @@ jobs:
             aux: ''
         # CHANGE platforms as needed
         platform: 
-          - {name: 'p2', version: '6.3.2'}
+          - {name: 'photon2', version: '6.3.2'}
 
     # program name
     name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
