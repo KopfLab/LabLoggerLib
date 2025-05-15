@@ -1,7 +1,4 @@
-# set the program and libs
-
-
-name: Compile ${{ env.program }}
+name: Compile blink
 
 on:
   workflow_dispatch:  
