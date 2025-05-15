@@ -1,15 +1,15 @@
 # name of the job
-name: Compile publish
+name: Compile controller
 
 # specify which paths to watch for changes
 on:
   workflow_dispatch:  
   push:
     paths:
-      - src/publish
+      - src/controller
       - LoggerCore/src
       - .github/workflows/compile.yaml
-      - .github/workflows/compile-publish.yaml
+      - .github/workflows/compile-controller.yaml
 
 # run compile via the compile.yaml
 jobs:
@@ -19,9 +19,9 @@ jobs:
       matrix:
         # CHANGE program/lib/aux as needed
         program:
-          - src: 'publish'
-            lib: 'DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
-            aux: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
+          - src: 'controller'
+            lib: 'LoggerCore DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
+            aux: ''
         # CHANGE platforms as needed
         platform: 
           - {name: 'p2', version: '6.3.2'}
