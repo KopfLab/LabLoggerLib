@@ -1,35 +1,31 @@
 name: Compile Firmware
 
 on:
-  workflow_dispatch:  
-  push:
-    paths:
-      - test/**
-      - Logger*/**
-      - .github/workflows/compile.yaml
+  workflow_call:
+    inputs:
+      platform:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      src:
+        required: true
+        type: string
+      lib:
+        required: false
+        type: string
+      aux:
+        required: false
+        type: string
+
 
 jobs:
   compile:
     runs-on: ubuntu-latest
 
-    name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: 
-          - {name: 'p2', version: '6.3.2'}
-#          - {name: 'argon', version: '4.2.0'}
-#          - {name: 'photon', version: '2.3.1'}
-        program:
-          - src: 'blink'
-            lib: 'DeviceNameHelperRK MyLib'
-          - src: 'publish'
-            lib: 'DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
-            aux: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
-          - src: 'controller'
-            lib: 'LoggerCore DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
-
+    name: ${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,25 +35,25 @@ jobs:
       - name: Gather application sources 
         run: |
           echo "Creating temporary source directory"
-          mkdir ${{ matrix.program.src }}
-          echo "Including sources from test/${{ matrix.program.src }}"
-          mv test/${{ matrix.program.src }}/* ${{ matrix.program.src }} 
+          mkdir ${{ inputs.src }}
+          echo "Including sources from test/${{ inputs.src }}"
+          mv test/${{ inputs.src }}/* ${{ inputs.src }} 
           echo "Including libraries:"
-          for lib in ${{ matrix.program.lib }}; do
+          for lib in ${{ inputs.lib }}; do
             if [ -d "$lib" ]; then
               echo " - $lib/src/*"
-              mv $lib/src/* ${{ matrix.program.src }}
+              mv $lib/src/* ${{ inputs.src }}
             elif [ -d "lib/$lib" ]; then
               echo " - lib/$lib/src/*"
-              mv lib/$lib/src/* ${{ matrix.program.src }}
+              mv lib/$lib/src/* ${{ inputs.src }}
             else
               echo " - could not find $lib, make sure the library exists"
             fi
           done
           echo "Including auxiliary resources:"
-          for aux in ${{ matrix.program.aux }}; do
+          for aux in ${{ inputs.aux }}; do
             echo " - $aux"
-            mv $aux ${{ matrix.program.src }}
+            mv $aux ${{ inputs.src }}
           done
 
       - name: Compile in cloud
@@ -65,24 +61,24 @@ jobs:
         uses: particle-iot/compile-action@v1
         with:
           particle-access-token: ${{ secrets.PARTICLE_ACCESS_TOKEN }}
-          particle-platform-name: ${{ matrix.platform.name }}
-          device-os-version: ${{ matrix.platform.version }}
-          sources-folder: ${{ matrix.program.src }}
+          particle-platform-name: ${{ inputs.platform }}
+          device-os-version: ${{ inputs.version }}
+          sources-folder: ${{ inputs.src }}
 
       - name: Move binary
         run: |
-          mv ${{ steps.compile.outputs.firmware-path }} ${{ matrix.program.src }}/${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}.bin
+          mv ${{ steps.compile.outputs.firmware-path }} ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
-          path: ${{ matrix.program.src }}
+          name: ${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}
+          path: ${{ inputs.src }}
 
       - name: Compile locally to debug
         if: ${{ failure() }}
         uses: particle-iot/compile-action@v1
         with:
-          particle-platform-name: ${{ matrix.platform.name }}
-          device-os-version: ${{ matrix.platform.version }}
-          sources-folder: ${{ matrix.program.src }}
+          particle-platform-name: ${{ inputs.platform }}
+          device-os-version: ${{ inputs.version }}
+          sources-folder: ${{ inputs.src }}

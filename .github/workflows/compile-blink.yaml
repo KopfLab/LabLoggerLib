@@ -1,0 +1,46 @@
+# set the program and libs
+env:
+  PROGRAM: 'blink'
+  LIB: 'DeviceNameHelperRK MyLib'
+
+name: Compile $PROGRAM
+
+on:
+  workflow_dispatch:  
+  push:
+    paths:
+      - src/$PROGRAM
+      - .github/workflows/compile.yaml
+      - .github/workflows/compile-$PROGRAM.yaml
+
+jobs:
+  compile:
+    # define which platforms to compile for
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: 
+          - {name: 'p2', version: '6.3.2'}
+          - {name: 'photon', version: '2.3.1'}
+#          - {name: 'argon', version: '4.2.0'}
+
+    # use the compile workflow
+    uses: ./.github/workflows/compile.yaml
+    with:
+      platform: ${{ matrix.platform.name }}
+      version: ${{ matrix.platform.version }}
+      src: $PROGRAM
+      lib: $LIB
+
+    # program name
+    name: $PROGRAM-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+
+            
+#        program:
+#          - src: 'blink'
+#            lib: 'DeviceNameHelperRK MyLib'
+#          - src: 'publish'
+#            lib: 'DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
+#            aux: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
+#          - src: 'controller'
+#            lib: 'LoggerCore DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
