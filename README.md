@@ -26,7 +26,7 @@ A BibTeX entry for LaTeX users is
 The following firmware is included in the repository to provide frequently used stand-alone tests for ***LabLogger*** devices and individual ***LabLogger*** components. The build status is based on automated cloud compile in the `Main` and `dev` branches.
 
 | Program  | main | dev  |
-| :------- | ---: | ---: |
+| :------- | :--- | :--- |
 | blink    | ![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main) | ![blink-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=dev) |
 | publish  | ![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main) | ![publish-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=dev) |
 
