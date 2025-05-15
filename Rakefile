@@ -1,3 +1,21 @@
+### USAGE ###
+
+# install the CLI from https://github.com/spark/particle-cli
+# log into your particle account with: particle login
+# to compile: rake PROGRAM 
+# to flash latest compile via USB: rake flash
+# to flash latest compile via cloud: rake flash DEVICE=name
+# to start serial monitor: rake monitor
+# to compile & flash: rake PROGRAM flash
+# to compile, flash & monitor: rake PROGRAM flash monitor
+
+### PROGRAMS ###
+
+task :blink => :compile
+task :publish => :compile
+
+### SETUP ###
+
 # setup
 require 'fileutils'
 require 'yaml'
@@ -21,11 +39,6 @@ platform = ENV['PLATFORM'] || 'photon2'
 version = ENV['VERSION'] || versions[platform]
 device = ENV['DEVICE']
 bin = ENV['BIN']
-
-### PROGRAMS ###
-
-task :blink => :compile
-task :publish => :compile
 
 ### COMPILE ###
 
@@ -70,7 +83,7 @@ task :compile do
       elsif Dir.exists?(File.join(lib_folder, path)) 
         File.join(lib_folder, path, src_folder)
       else
-        raise "Warning: could not find '#{path}' library in root or #{lib_folder} - make sure it exists"
+        raise "Warning: could not find '#{path}' library in root or #{lib_folder} - rake sure it exists"
       end
     end.compact
     lib_path = paths.join(' ')
@@ -141,4 +154,41 @@ desc "start serial monitor"
 task :monitor do
   puts "\nINFO: connecting to serial monitor..."
   sh "particle serial monitor --follow"
+end
+
+desc "remove .bin files"
+task :clean do
+  puts "\nINFO: removing all .bin files..."
+  sh "rm -f #{bin_folder}/*.bin"
+end
+
+desc "setup particle device --> deprecated"
+task :setup do
+  # this is no longer supported over serial
+  puts "INFO: don't do this over serial, go to https://setup.particle.io/ instead now"
+end
+
+desc "start repair doctor --> deprecated"
+task :doctor do
+  # particle doctor is no longer supported
+  puts "USE THIS INSTEAD NOW: https://docs.particle.io/tools/doctor/"
+end
+
+desc "update device OS"
+task :update do
+  puts "\nINFO: updating device OS of the device connected on USB to #{version}..."
+  print "Are you sure you want to continue? (y/N): "
+  answer = STDIN.gets.strip.downcase
+  unless answer == 'y' || answer == 'yes'
+    exit 1
+  end
+  sh "particle usb dfu"
+  sh "particle update --target #{version}"
+end
+
+desc "flash the tinker app"
+# commands: digitalWrite "D7,HIGH", analogWrite, digitalRead, analogRead "A0"
+task :update do
+  puts "\nINFO: flashing tinker..."
+  sh "particle flash --usb tinker"
 end
