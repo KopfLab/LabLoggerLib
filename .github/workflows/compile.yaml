@@ -36,8 +36,8 @@ jobs:
         run: |
           echo "Creating temporary source directory"
           mkdir ${{ inputs.src }}
-          echo "Including sources from test/${{ inputs.src }}"
-          mv test/${{ inputs.src }}/* ${{ inputs.src }} 
+          echo "Including sources from src/${{ inputs.src }}"
+          mv src/${{ inputs.src }}/* ${{ inputs.src }} 
           echo "Including libraries:"
           for lib in ${{ inputs.lib }}; do
             if [ -d "$lib" ]; then
