@@ -3,7 +3,6 @@ name: Compile publish
 
 # specify which paths to watch for changes
 on:
-  workflow_dispatch:  
   push:
     paths:
       - src/publish
