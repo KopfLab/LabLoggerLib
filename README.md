@@ -23,7 +23,7 @@ A BibTeX entry for LaTeX users is
 
 ## Firmware
 
-The following firmware is included in the repository to provide frequently used stand-alone tests for ***LabLogger*** devices and individual ***LabLogger*** components. The build status is based on automated cloud compile in the `Main` and `dev` branches.
+The following firmware is included in the repository to provide frequently used stand-alone tests for ***LabLogger*** devices and individual ***LabLogger*** components. The build status is based on automated cloud compile in the `main` and `dev` branches.
 
 | Program  | *main* branch | *dev* branch  |
 | :------- | :--- | :--- |
