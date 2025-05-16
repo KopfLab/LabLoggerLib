@@ -1,13 +1,13 @@
 # name of the job
-name: Compile blink
+name: Compile i2c scanner
 
 # specify which paths to watch for changes
 on:
   push:
     paths:
-      - src/blink
+      - src/i2c_scanner
       - .github/workflows/compile.yaml
-      - .github/workflows/compile-blink.yaml
+      - .github/workflows/compile-i2c_scanner.yaml
 
 # run compile via the compile.yaml
 jobs:
@@ -17,14 +17,14 @@ jobs:
       matrix:
         # CHANGE program/lib/aux as needed
         program:
-          - src: 'blink'
-            lib: 'DeviceNameHelperRK/src MyLib/src'
+          - src: 'i2c_scanner'
+            lib: ''
             aux: ''
         # CHANGE platforms as needed
         platform: 
-          - {name: 'p2', version: '6.3.2'}
           - {name: 'photon', version: '2.3.1'}
           - {name: 'argon', version: '4.2.0'}
+          - {name: 'p2', version: '6.3.2'}
 
     # program name
     name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}

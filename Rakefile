@@ -3,17 +3,20 @@
 # install the CLI from https://github.com/spark/particle-cli
 # install ruby rake with: bundle install
 # log into your particle account with: particle login
-# to compile: rake PROGRAM 
+# to compile program x: rake x
+# to compile program x without shortcut: rake compile PROGRAM=x
 # to flash latest compile via USB: rake flash
 # to flash latest compile via cloud: rake flash DEVICE=name
 # to start serial monitor: rake monitor
-# to compile & flash: rake PROGRAM flash
-# to compile, flash & monitor: rake PROGRAM flash monitor
+# to compile & flash: rake x flash
+# to compile, flash & monitor: rake x flash monitor
 
 ### PROGRAMS ###
 
 task :blink => :compile
 task :publish => :compile
+task :i2c_scanner => :compile
+task :oled => :compile
 
 ### SETUP ###
 
@@ -46,7 +49,7 @@ bin = ENV['BIN']
 desc "compile binary in the cloud"
 task :compile do
   # what program are we compiling?
-  program = Rake.application.top_level_tasks.first
+  program = ENV['PROGRAM'] || Rake.application.top_level_tasks.first
   if program == "default"
     next
   end
@@ -62,47 +65,55 @@ task :compile do
   # paths
   workflow_path = File.join(".github", "workflows", "compile-#{program}.yaml")
   unless File.exist?(workflow_path)
-    raise "Workflow YAML config file not found: #{workflow_path}"
+    warn "Workflow YAML config file not found, compiling just with source folder: #{workflow_path}"
+    src_path = program
+    lib_path = ""
+    aux_files = ""
+  else
+    workflow = YAML.load_file(workflow_path)
+    paths = workflow.dig("jobs", "compile", "strategy", "matrix", "program")[0]
+    src_path = paths["src"]
+    lib_path = paths["lib"]
+    aux_files = paths["aux"]
+    if src_path.nil? || src_path.strip.empty?
+      raise "Error: could not extract src/lib/aux dependencies from #{workflow_path}"
+    end 
   end
-  workflow = YAML.load_file(workflow_path)
-
-  paths = workflow.dig("jobs", "compile", "strategy", "matrix", "program")[0]
-  src_path = paths["src"]
-  lib_path = paths["lib"]
-  aux_path = paths["aux"]
-  if src_path.nil? || src_path.strip.empty?
-    raise "Error: could not extract src/lib/aux dependencies from #{workflow_path}"
-  end 
-
+  
   # source
   src_path = File.join(src_folder, src_path)
   unless Dir.exist?(src_path)
     raise "Error: folder '#{src_path}' does not exist."
   end
+  src_files = Dir.glob("#{src_path}/**/*.{h,c,cpp,properties}").join(' ')
 
   # libs
   unless lib_path.nil? || lib_path.strip.empty?
     paths = lib_path.strip.split(/\s+/).map do |path|
       if Dir.exist?(path)
-        File.join(path, src_folder)
+        path
       elsif Dir.exists?(File.join(lib_folder, path)) 
-        File.join(lib_folder, path, src_folder)
+        File.join(lib_folder, path)
       else
-        raise "Warning: could not find '#{path}' library in root or #{lib_folder} - rake sure it exists"
+        raise "Could not find '#{path}' library in root or #{lib_folder} - make sure it exists"
       end
     end.compact
     lib_path = paths.join(' ')
+    lib_files = paths.map do |path|
+      Dir.glob("#{path}/**/*.{h,c,cpp}").join(' ')
+    end
+    lib_files = lib_files.join(' ')
   end
 
   # info
   puts "\nINFO: compiling '#{program}' in the cloud for #{platform} #{version}...."
   puts " - src path: #{src_path}"
   puts " - lib paths: #{lib_path}"
-  puts " - aux files: #{aux_path}"
+  puts " - aux files: #{aux_files}"
   puts "\n"
-
+  
   # compile
-  sh "particle compile #{platform} #{src_path} #{src_path}/project.properties #{lib_path} #{aux_path} --target #{version} --saveTo #{bin_folder}/#{program}-#{platform}-#{version}.bin", verbose: false
+  sh "particle compile #{platform} #{src_files} #{lib_files} #{aux_files} --target #{version} --saveTo #{bin_folder}/#{program}-#{platform}-#{version}.bin", verbose: false
 end
 
 ### FLASH ###
@@ -147,6 +158,7 @@ desc "list available devices connected to USB"
 task :list do
   puts "\nINFO: querying list of available USB devices..."
   sh "particle usb list"
+  sh "particle identify"
 end
 
 desc "get MAC address of device connected to USB"
@@ -200,6 +212,7 @@ end
 desc "update device OS"
 task :update do
   puts "\nINFO: updating device OS of the device connected on USB to #{version}..."
+  puts "Careful, the firmware on the device needs to be compatible with the new OS (tinker is usually safe)."
   print "Are you sure you want to continue? (y/N): "
   answer = STDIN.gets.strip.downcase
   unless answer == 'y' || answer == 'yes'
@@ -211,18 +224,20 @@ end
 
 desc "flash the tinker app"
 # commands: digitalWrite "D7,HIGH", analogWrite, digitalRead, analogRead "A0"
-task :update do
+task :tinker do
   puts "\nINFO: flashing tinker..."
   sh "particle flash --usb tinker"
 end
 
 desc "used by Guardfile to automatically re-compile binaries on code changes"
-task :autoCompile, [:program, :paths] do |t, args|
+task :autoCompile, [:program, :platform, :version, :paths] do |t, args|
   puts "\n**** RE-COMPILE AUTOMATICALLY ****"
-  puts "program: #{args.program}\nmodified files:"
+  puts "program: #{args.program}"
+  puts "platform: #{args.platform} #{args.version}"
+  puts "modified files:"
   args.paths.each do |path|
     puts " - #{path}"
   end
-  sh "bundle exec rake #{args.program}", verbose: false
+  sh "bundle exec rake compile PROGRAM=#{args.program} PLATFORM=#{args.platform} VERSION=#{args.version}", verbose: false
   puts "**** RE-COMPILE COMPLETE ****"
 end

@@ -2,6 +2,11 @@
 
 #include "Particle.h"
 
+// address issue where this is not defined anymore in newer firmware
+#ifndef PLATFORM_PHOTON 
+#define PLATFORM_PHOTON 0 
+#endif
+
 // file helper to get at flash system usage
 // dependencies.FileHelperRK=0.0.3
 #include "FileHelperRK.h"

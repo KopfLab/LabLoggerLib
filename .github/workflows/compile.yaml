@@ -1,4 +1,4 @@
-name: Compile Firmware
+name: Base workflow_call for compile actions
 
 on:
   workflow_call:
@@ -41,13 +41,13 @@ jobs:
           echo "Including libraries:"
           for lib in ${{ inputs.lib }}; do
             if [ -d "$lib" ]; then
-              echo " - $lib/src/*"
-              mv $lib/src/* ${{ inputs.src }}
+              echo " - $lib/*"
+              mv $lib/* ${{ inputs.src }}
             elif [ -d "lib/$lib" ]; then
-              echo " - lib/$lib/src/*"
-              mv lib/$lib/src/* ${{ inputs.src }}
+              echo " - lib/$lib/*"
+              mv lib/$lib/* ${{ inputs.src }}
             else
-              echo " - could not find $lib, make sure the library exists"
+              echo " - could not find $lib, make sure the folder exists"
             fi
           done
           echo "Including auxiliary resources:"
@@ -56,7 +56,8 @@ jobs:
             mv $aux ${{ inputs.src }}
           done
 
-      - name: Compile in cloud
+      - name: Compile in cloud (on master)
+        if: ${{ github.ref == 'refs/heads/master' }}
         id: compile
         uses: particle-iot/compile-action@v1
         with:
@@ -65,20 +66,27 @@ jobs:
           device-os-version: ${{ inputs.version }}
           sources-folder: ${{ inputs.src }}
 
-      - name: Move binary
+      - name: Move cloud binary
+        if: ${{ github.ref == 'refs/heads/master' }}
         run: |
           mv ${{ steps.compile.outputs.firmware-path }} ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
+
+      - name: Compile locally # if not on master or if cloud compile failed
+        if: ${{ failure() || github.ref != 'refs/heads/master' }}
+        id: localcompile
+        uses: particle-iot/compile-action@v1
+        with:
+          particle-platform-name: ${{ inputs.platform }}
+          device-os-version: ${{ inputs.version }}
+          sources-folder: ${{ inputs.src }}
+
+      - name: Move local binary
+        if: ${{ github.ref != 'refs/heads/master' }}
+        run: |
+          mv ${{ steps.localcompile.outputs.firmware-path }} ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}
           path: ${{ inputs.src }}
-
-      - name: Compile locally to debug
-        if: ${{ failure() }}
-        uses: particle-iot/compile-action@v1
-        with:
-          particle-platform-name: ${{ inputs.platform }}
-          device-os-version: ${{ inputs.version }}
-          sources-folder: ${{ inputs.src }}

@@ -60,3 +60,6 @@ bin/*.bin
 
 # gemfile
 Gemfile.lock
+
+# credentials
+credentials
