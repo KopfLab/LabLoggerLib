@@ -158,6 +158,7 @@ desc "list available devices connected to USB"
 task :list do
   puts "\nINFO: querying list of available USB devices..."
   sh "particle usb list"
+  sh "particle identify"
 end
 
 desc "get MAC address of device connected to USB"
