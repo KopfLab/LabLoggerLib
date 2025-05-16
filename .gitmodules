@@ -13,3 +13,12 @@
 [submodule "lib/SparkFun_Qwiic_OpenLog_Arduino_Library"]
 	path = lib/SparkFun_Qwiic_OpenLog_Arduino_Library
 	url = https://github.com/sparkfun/SparkFun_Qwiic_OpenLog_Arduino_Library.git
+[submodule "lib/Adafruit_SSD1306_RK"]
+	path = lib/Adafruit_SSD1306_RK
+	url = https://github.com/rickkas7/Adafruit_SSD1306_RK
+[submodule "lib/Adafruit_GFX_RK"]
+	path = lib/Adafruit_GFX_RK
+	url = https://github.com/rickkas7/Adafruit_GFX_RK
+[submodule "lib/Adafruit_BusIO_RK"]
+	path = lib/Adafruit_BusIO_RK
+	url = https://github.com/rickkas7/Adafruit_BusIO_RK

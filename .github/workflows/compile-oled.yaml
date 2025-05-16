@@ -1,0 +1,40 @@
+# name of the job
+name: Compile oled
+
+# specify which paths to watch for changes
+on:
+  push:
+    paths:
+      - src/oled
+      - .github/workflows/compile.yaml
+      - .github/workflows/compile-oled.yaml
+
+# run compile via the compile.yaml
+jobs:
+  compile:
+    strategy:
+      fail-fast: false
+      matrix:
+        # CHANGE program/lib/aux as needed
+        program:
+          - src: 'oled'
+            lib: 'Adafruit_SSD1306_RK/src Adafruit_GFX_RK/src Adafruit_BusIO_RK/src'
+            aux: ''
+        # CHANGE platforms as needed
+        platform: 
+          - {name: 'photon', version: '2.3.1'}
+          - {name: 'argon', version: '4.2.0'}
+          - {name: 'p2', version: '6.3.2'}
+
+    # program name
+    name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+
+    # workflow call
+    uses: ./.github/workflows/compile.yaml
+    secrets: inherit
+    with:
+      platform: ${{ matrix.platform.name }}
+      version: ${{ matrix.platform.version }}
+      src: ${{ matrix.program.src }}
+      lib: ${{ matrix.program.lib }}
+      aux: ${{ matrix.program.aux }}
