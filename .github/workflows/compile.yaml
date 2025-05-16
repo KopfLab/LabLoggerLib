@@ -56,11 +56,19 @@ jobs:
             mv $aux ${{ inputs.src }}
           done
 
-      - name: Compile in cloud
+      - name: Compile in cloud (on master)
         id: compile
         uses: particle-iot/compile-action@v1
         with:
           particle-access-token: ${{ secrets.PARTICLE_ACCESS_TOKEN }}
+          particle-platform-name: ${{ inputs.platform }}
+          device-os-version: ${{ inputs.version }}
+          sources-folder: ${{ inputs.src }}
+
+      - name: Compile locally # if not on master or if cloud compile failed
+        if: ${{ failure() || github.ref != 'refs/heads/master' }}
+        uses: particle-iot/compile-action@v1
+        with:
           particle-platform-name: ${{ inputs.platform }}
           device-os-version: ${{ inputs.version }}
           sources-folder: ${{ inputs.src }}
@@ -74,11 +82,3 @@ jobs:
         with:
           name: ${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}
           path: ${{ inputs.src }}
-
-      - name: Compile locally to debug
-        if: ${{ failure() }}
-        uses: particle-iot/compile-action@v1
-        with:
-          particle-platform-name: ${{ inputs.platform }}
-          device-os-version: ${{ inputs.version }}
-          sources-folder: ${{ inputs.src }}

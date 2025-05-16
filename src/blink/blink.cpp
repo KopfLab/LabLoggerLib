@@ -34,7 +34,9 @@ void info_handler(const char *topic, const char *data) {
 }
 
 // enable sysstem treading
+#ifndef SYSTEM_VERSION_v620
 SYSTEM_THREAD(ENABLED);
+#endif
 
 // manual mode
 SYSTEM_MODE(MANUAL);

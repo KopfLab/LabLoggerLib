@@ -31,6 +31,7 @@ jobs:
 
     # workflow call
     uses: ./.github/workflows/compile.yaml
+    secrets: inherit
     with:
       platform: ${{ matrix.platform.name }}
       version: ${{ matrix.platform.version }}
