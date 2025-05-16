@@ -73,20 +73,17 @@ jobs:
 
       - name: Compile locally # if not on master or if cloud compile failed
         if: ${{ failure() || github.ref != 'refs/heads/master' }}
+        id: localcompile
         uses: particle-iot/compile-action@v1
         with:
           particle-platform-name: ${{ inputs.platform }}
           device-os-version: ${{ inputs.version }}
           sources-folder: ${{ inputs.src }}
 
-      - name: Move compile results
+      - name: Move local binary
+        if: ${{ github.ref != 'refs/heads/master' }}
         run: |
-          ls -la /
-          ls -la ./
-          ls -la /firmware/modules/tron/user-part
-          ls -la /workspace/target
-          mv /workspace/target/workspace.lst ${{ inputs.src }}/
-          mv /workspace/target/workspace.bin ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
+          mv ${{ steps.localcompile.outputs.firmware-path }} ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
