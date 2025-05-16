@@ -57,6 +57,7 @@ jobs:
           done
 
       - name: Compile in cloud (on master)
+        if: ${{ github.ref == 'refs/heads/master' }}
         id: compile
         uses: particle-iot/compile-action@v1
         with:
