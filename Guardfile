@@ -14,8 +14,9 @@ bin_folder = "bin"
 
 # program
 last_bin = Dir.glob(File.join(bin_folder, '*.bin')).select { |f| File.file?(f) }.max_by { |f| File.mtime(f) }
-program = File.basename(last_bin).split('-').first
-puts "\nINFO: Setting up guard to re-compile '#{program}' when there are code changes in:"
+program, platform, version = File.basename(last_bin).split('-')
+version = version.chomp('.bin')
+puts "\nINFO: Setting up guard to re-compile '#{program}' for #{platform} #{version} when there are code changes in:"
 
 # workflow
 workflow_path = File.join(".github", "workflows", "compile-#{program}.yaml")
@@ -32,7 +33,7 @@ end
 puts "\n"
 
 # guard
-guard 'rake', :task => 'autoCompile', :run_on_start => false, wait_for_changes: true, :task_args => [program] do
+guard 'rake', :task => 'autoCompile', :run_on_start => false, wait_for_changes: true, :task_args => [program, platform, version] do
   watch_paths.each do |pattern|
     watch(Regexp.new(pattern))
   end

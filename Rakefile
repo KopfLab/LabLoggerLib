@@ -228,12 +228,14 @@ task :update do
 end
 
 desc "used by Guardfile to automatically re-compile binaries on code changes"
-task :autoCompile, [:program, :paths] do |t, args|
+task :autoCompile, [:program, :platform, :version, :paths] do |t, args|
   puts "\n**** RE-COMPILE AUTOMATICALLY ****"
-  puts "program: #{args.program}\nmodified files:"
+  puts "program: #{args.program}"
+  puts "platform: #{args.platform} #{args.version}"
+  puts "modified files:"
   args.paths.each do |path|
     puts " - #{path}"
   end
-  sh "bundle exec rake #{args.program}", verbose: false
+  sh "bundle exec rake compile PROGRAM=#{args.program} PLATFORM=#{args.platform} VERSION=#{args.version}", verbose: false
   puts "**** RE-COMPILE COMPLETE ****"
 end
