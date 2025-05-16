@@ -95,7 +95,7 @@ task :compile do
       elsif Dir.exists?(File.join(lib_folder, path)) 
         File.join(lib_folder, path)
       else
-        raise "Warning: could not find '#{path}' library in root or #{lib_folder} - rake sure it exists"
+        raise "Could not find '#{path}' library in root or #{lib_folder} - make sure it exists"
       end
     end.compact
     lib_path = paths.join(' ')
