@@ -81,6 +81,10 @@ jobs:
 
       - name: Move compile results
         run: |
+          ls -la /
+          ls -la ./
+          ls -la /firmware/modules/tron/user-part
+          ls -la /workspace/target
           mv /workspace/target/workspace.lst ${{ inputs.src }}/
           mv /workspace/target/workspace.bin ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
 
