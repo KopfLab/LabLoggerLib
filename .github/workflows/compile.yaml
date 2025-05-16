@@ -66,6 +66,11 @@ jobs:
           device-os-version: ${{ inputs.version }}
           sources-folder: ${{ inputs.src }}
 
+      - name: Move cloud binary
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          mv ${{ steps.compile.outputs.firmware-path }} ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
+
       - name: Compile locally # if not on master or if cloud compile failed
         if: ${{ failure() || github.ref != 'refs/heads/master' }}
         uses: particle-iot/compile-action@v1
@@ -74,9 +79,10 @@ jobs:
           device-os-version: ${{ inputs.version }}
           sources-folder: ${{ inputs.src }}
 
-      - name: Move binary
+      - name: Move compile results
         run: |
-          mv ${{ steps.compile.outputs.firmware-path }} ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
+          mv /workspace/target/workspace.lst ${{ inputs.src }}/
+          mv /workspace/target/workspace.bin ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
