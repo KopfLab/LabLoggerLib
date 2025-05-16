@@ -26,6 +26,7 @@ The following firmware is included in the repository to provide frequently used 
 | Program  | *main* branch | *dev* branch  |
 | :------- | :--- | :--- |
 | blink    | ![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main) | ![blink-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=dev) |
+| i2c_scanner    | ![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=main) | ![blink-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=dev) |
 | publish  | ![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main) | ![publish-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=dev) |
 
 ### Compile
@@ -53,6 +54,17 @@ The configuration for individual programs is managed via their compile workflow 
 
 The workflow YAML additionally specifies which folders to watch for changes to trigger the automatic rebuild on GitHub in the `push` -> `paths` setting. This information is also used by the [Guardfile](Guardfile) to figure out which files should trigger an automatic rebuild during development. Use `rake PROGRAM` to compile a program for the first time and then activate automatic re-compiles by running `bundle exec guard`. It will figure out which program was last build, pull the folders to watch out of the workflow YAML and trigger re-compile if anything changes. 
 
+To add a new program (`myprog`):
+
+ - work in a development git branch (e.g. `dev-myprog`)
+ - create a sub folder `src/myprog` that includes a `project.properties` file with `name=myprog` and a list of commented out dependencies
+ - if there are any new dependencies, add them to the table at the end of the `README.md`, and as git submodules in the lib/ folder via `cd lib` + `git submodule add https://github.com/...`
+ - add a YAML workflow for github actions in `.github/workflows/compile-myprog.yaml` (see e.g. `i2c_scanner` as example) that lists the `src`, `lib` and `aux` needed to compile the program
+ - add a task in the `Rakefile` under the `### PROGRAM ###` subheading that's simply `task :myprog => :compile`
+ - test compilation with `rake myprog`, fix issues in the sources (`src/myprog/`) and with libraries as needed until it compiles successfully
+ - use `bundle exec guard` to continue development with auto compilation
+ - once the program works as intended and compiles correctly via GitHub actions (https://github.com/kopflab/LabLoggerLibs/actions), add it to the list of firmware in the `README.md` with the github actions badges to `main` and `dev` (whichever dev branch is the correct one, e.g. `dev-myprog`)
+
 ## Libraries
 
 ### LoggerCore
@@ -78,7 +90,8 @@ The following third-party software is used in the ***LabLogger*** libraries:
 | LoggerCore  | SequentialFileRK                       | https://github.com/rickkas7/SequentialFileRK                       | MIT         |
 | LoggerCore  | PublishQueueExtRK                      | https://github.com/rickkas7/PublishQueueExtRK                      | MIT         |
 | LoggerCore  | SparkFun_Qwiic_OpenLog_Arduino_Library | https://github.com/sparkfun/SparkFun_Qwiic_OpenLog_Arduino_Library | MIT         |
-| LoggerCore  | OneWire                                | https://github.com/particle-iot/OneWireLibrary                     | MIT         |
 | LoggerOled  | Adafruit_SSD1306                       | https://github.com/adafruit/Adafruit_SSD1306                       | BSD         |
+| LoggerOled  | Adafruit-GFX-Library                   | https://github.com/adafruit/Adafruit-GFX-Library                   | BSD         |
+| LoggerOled  | Adafruit_BusIO                         | https://github.com/adafruit/Adafruit_BusIO                         | MIT         |
 
 
