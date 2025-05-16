@@ -1,4 +1,4 @@
-name: Compile Firmware
+name: Base workflow_call for compile actions
 
 on:
   workflow_call:
