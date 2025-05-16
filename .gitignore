@@ -57,3 +57,6 @@ bin/*.bin
 
 # OS
 .DS_Store
+
+# gemfile
+Gemfile.lock

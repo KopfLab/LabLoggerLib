@@ -1,6 +1,7 @@
 ### USAGE ###
 
 # install the CLI from https://github.com/spark/particle-cli
+# install ruby rake with: bundle install
 # log into your particle account with: particle login
 # to compile: rake PROGRAM 
 # to flash latest compile via USB: rake flash
@@ -23,7 +24,7 @@ require 'yaml'
 # recommended versions
 # see https://docs.particle.io/reference/product-lifecycle/long-term-support-lts-releases/
 versions = {
-  'photon2' => '6.3.2', # not LTS but required for CloudEvent
+  'p2' => '6.3.2', # not LTS but required for CloudEvent
   'photon' => '2.3.1',  # LTS
   'argon' => '4.2.0',   # LTS
   'boron' => '4.2.0'    # LTS
@@ -35,7 +36,7 @@ lib_folder = "lib"
 bin_folder = "bin"
 
 # parameters
-platform = ENV['PLATFORM'] || 'photon2'
+platform = ENV['PLATFORM'] || 'p2'
 version = ENV['VERSION'] || versions[platform]
 device = ENV['DEVICE']
 bin = ENV['BIN']
@@ -46,6 +47,9 @@ desc "compile binary in the cloud"
 task :compile do
   # what program are we compiling?
   program = Rake.application.top_level_tasks.first
+  if program == "default"
+    next
+  end
 
   # safety checks
   if platform.nil? || platform.strip.empty?
@@ -61,6 +65,7 @@ task :compile do
     raise "Workflow YAML config file not found: #{workflow_path}"
   end
   workflow = YAML.load_file(workflow_path)
+
   paths = workflow.dig("jobs", "compile", "strategy", "matrix", "program")[0]
   src_path = paths["src"]
   lib_path = paths["lib"]
@@ -136,7 +141,7 @@ task :flash do
   end
 end
 
-### TOOLS ###
+### INFO ###
 
 desc "list available devices connected to USB"
 task :list do
@@ -155,6 +160,24 @@ task :monitor do
   puts "\nINFO: connecting to serial monitor..."
   sh "particle serial monitor --follow"
 end
+
+task :help => :programs do
+  puts "\n**** AVAILABLE TASKS ****\n\n"
+  sh "bundle exec rake -T", verbose: false
+  puts "\n"
+end
+
+task :programs do
+  puts "\n**** AVAILABLE PROGRAMS ****\n\n"
+  Rake::Task.tasks.each do |task|
+    if !task.prerequisites.empty? && task.prerequisites[0] == "compile"
+      puts "rake #{task.name}"
+    end
+  end
+  puts "\n"
+end
+
+### TOOLS ###
 
 desc "remove .bin files"
 task :clean do
@@ -191,4 +214,15 @@ desc "flash the tinker app"
 task :update do
   puts "\nINFO: flashing tinker..."
   sh "particle flash --usb tinker"
+end
+
+desc "used by Guardfile to automatically re-compile binaries on code changes"
+task :autoCompile, [:program, :paths] do |t, args|
+  puts "\n**** RE-COMPILE AUTOMATICALLY ****"
+  puts "program: #{args.program}\nmodified files:"
+  args.paths.each do |path|
+    puts " - #{path}"
+  end
+  sh "bundle exec rake #{args.program}", verbose: false
+  puts "**** RE-COMPILE COMPLETE ****"
 end
