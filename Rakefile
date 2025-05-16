@@ -212,6 +212,7 @@ end
 desc "update device OS"
 task :update do
   puts "\nINFO: updating device OS of the device connected on USB to #{version}..."
+  puts "Careful, the firmware on the device needs to be compatible with the new OS (tinker is usually safe)."
   print "Are you sure you want to continue? (y/N): "
   answer = STDIN.gets.strip.downcase
   unless answer == 'y' || answer == 'yes'
@@ -223,7 +224,7 @@ end
 
 desc "flash the tinker app"
 # commands: digitalWrite "D7,HIGH", analogWrite, digitalRead, analogRead "A0"
-task :update do
+task :tinker do
   puts "\nINFO: flashing tinker..."
   sh "particle flash --usb tinker"
 end
