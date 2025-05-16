@@ -41,13 +41,13 @@ jobs:
           echo "Including libraries:"
           for lib in ${{ inputs.lib }}; do
             if [ -d "$lib" ]; then
-              echo " - $lib/src/*"
-              mv $lib/src/* ${{ inputs.src }}
+              echo " - $lib/*"
+              mv $lib/* ${{ inputs.src }}
             elif [ -d "lib/$lib" ]; then
-              echo " - lib/$lib/src/*"
-              mv lib/$lib/src/* ${{ inputs.src }}
+              echo " - lib/$lib/*"
+              mv lib/$lib/* ${{ inputs.src }}
             else
-              echo " - could not find $lib, make sure the library exists"
+              echo " - could not find $lib, make sure the folder exists"
             fi
           done
           echo "Including auxiliary resources:"

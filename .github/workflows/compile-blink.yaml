@@ -18,7 +18,7 @@ jobs:
         # CHANGE program/lib/aux as needed
         program:
           - src: 'blink'
-            lib: 'DeviceNameHelperRK MyLib'
+            lib: 'DeviceNameHelperRK/src MyLib/src'
             aux: ''
         # CHANGE platforms as needed
         platform: 
