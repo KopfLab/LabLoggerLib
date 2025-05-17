@@ -22,8 +22,6 @@ jobs:
             aux: ''
         # CHANGE platforms as needed
         platform: 
-          - {name: 'photon', version: '2.3.1'}
-          - {name: 'argon', version: '4.2.0'}
           - {name: 'p2', version: '6.3.2'}
 
     # program name
