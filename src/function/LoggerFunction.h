@@ -1,12 +1,29 @@
 #pragma once
 #include "Particle.h"
+#include "LoggerFunctionReturns.h"
 
+/**
+ * extension of return codes
+ */
+namespace LoggerFunctionReturns {
+    inline constexpr Error CMD_ERR_UNKNOWN   = {-1, "undefined error"};
+    inline constexpr Error CMD_ERR_EMPTY     = {-2, "call is empty"};
+    inline constexpr Error CMD_ERR_AMBIGUOUS = {-3, "command ambiguous (exists in multiple modules), specify module"};
+    inline constexpr Error CMD_ERR_CMD_MOD   = {-4, "module/command not recognized"};
+    inline constexpr Error CMD_ERR_CMD_MISS  = {-5, "module found but no command provided"};
+    inline constexpr Error CMD_ERR_CMD       = {-6, "module found but command not recognized"};
+}
+
+/**
+ * class that manages a function call for the logger
+ */
 class LoggerFunction {
 
     private:
 
         // name of the function that's registered with Particle.function
         const char* m_function;
+        const size_t PARSING_ERROR = std::numeric_limits<size_t>::max();
 
     protected:
 
@@ -29,109 +46,36 @@ class LoggerFunction {
 
         LoggerFunction(const char* function) : m_function(function) {}
 
-        void setup() {
-            Log.info("registering particle function '%s'", m_function);
-            Particle.function(m_function, &LoggerFunction::receiveCall, this);
+        void setup();
+
+        /**
+         * @brief register a cloud command with an instance and method
+         */
+        template <typename T>
+        void registerCommand(T* instance, bool (T::*method)(Variant&), const char* module, const char* cmd) {
+            std::function<bool(Variant&)> cb = std::bind(method, instance, _1);
+            registerCommand(cb, module, cmd);
         }
 
-        // register cloud command
-        void registerCommand(const std::function<bool(Variant&)>& cb, const char* module, const char* cmd) {
-            Log.info("registering command '%s' for module '%s'", cmd, module);
-            m_commands.push_back({cb, module, cmd});
-        }
+        /**
+         * @brief register a cloud command directly with a std:function call
+         */
+        void registerCommand(const std::function<bool(Variant&)>& cb, const char* module, const char* cmd);
 
-        Variant getCommands() {
-            Variant cmds;
-            for (auto& cmd : m_commands) {
-                cmds.append(commandToVariant(cmd));
-            }
-            return(cmds);
-        }
+        /**
+         * @brief get back a Variant with all the commands
+         */
+        Variant getCommands();
 
-        // receive cloud command
-        int receiveCall (String call) {
-            Log.info("received: %s", call.c_str());
-            Variant parsed = parseCall(call);
-            Log.info("parsed: %s", parsed.toJSON().c_str());
+        /**
+         * @brief internal function that's registered with the Particle cloud to process user commands
+         */
+        int receiveCall (String call);
 
-            bool success = false;
-            // run all callbacks
-            //for (auto& cmd : m_commands) {
-            //    success = cmd.callback(parsed);
-            //}
-            // FIXME: only call the one that was identified as the correct one
-            // FIXME: provide some sort of static method in LoggerFunction::error and LoggerFunction.warning
-            // that register parset.set("ret") and parsed.set("err") / parsed.set("warn")
-            // find a good way to register the error codes, probably with a namespace and structure so everything always has a text AND a retval!!
+        /**
+         * @brief parse the function call and store the results in the parsed Variant
+         * @return the m_commands index of the command that fits the call (or PARSED_ERROR if parsing error)
+         */
+        size_t parseCall(Variant& parsed);
 
-            // register success or fail
-            parsed.set("success", success);
-
-            // if no ret val set yet
-            if (success && !parsed.has("ret")) {
-                parsed.set("ret", 0L); // FIXME: use placeholder for success
-            } else if (!success && !parsed.has("ret")) {
-                parsed.set("ret", -1L);
-                // FIXME: use placeholders for these codes
-                //LoggerFunction::error(ERROR_UNKNOWN); // registers the unknown error and the return value
-                //LoggerFunction::warn(WARN_BLA); // errors overwrite all warnings, all warnings are reported if there are multiple (but no error) - Q: how to deal with return codes?
-            } 
-
-            // check
-            Log.info("after callbacks: %s", parsed.toJSON().c_str());
-            
-            // report command to cloud / FIXME implement
-            // add dt: timestamp
-            // add t: type = cmd
-            // LoggerPublisher::queueData(parsed);
-
-            // return function
-            return(parsed.get("ret").asInt());
-        }
-
-        Variant parseCall(String& call) {
-            // started the parsed call variant
-            Variant parsed;
-            parsed.set("call", call.c_str());
-            
-            // make a mutable local copy for thread safety
-            char *copy = strdup(call.c_str());
-
-            // empty call?
-            if (copy == nullptr) {
-                parsed.set("err", "call is empty");
-                return(parsed);
-            }
-
-            // get module
-            char *part = strtok(copy, " ");
-            parsed.set("m", part);
-
-            // module exists?
-            bool mod_found = false;
-            for (auto& cmd : m_commands) {
-                if (strcmp(part, cmd.cmd) == 0) {
-                    Log.trace("module match: %s", cmd.cmd);
-                    mod_found = true;
-                    break;
-                }
-            }
-
-            if (!mod_found) {
-                parsed.set("err", "module not recognized");
-                return(parsed);
-            }
-
-            // command exists?
-            // FIXME: check all commands that match the module and the command
-            // FIXME: pull out params user= and note= 
-            // FIXME: in database, store ret as return_code, store err / warn in return_value
-            // continue here
-
-            //if (!part) {
-            //    parsed.set("error", "");
-            //}
-            // return the parsed command
-            return(parsed);
-        }
 };
