@@ -1,4 +1,4 @@
-name: Base workflow_call for compile actions
+name: Base workflow for compile
 
 on:
   workflow_call:
