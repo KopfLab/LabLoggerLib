@@ -13,13 +13,13 @@ SerialLogHandler logHandler(LOG_LEVEL_INFO, { // Logging level for non-applicati
     { "app", LOG_LEVEL_TRACE } // Logging level for application messages (i.e. debug mode)
 });
 
-
+// custom return value examples
 namespace LoggerFunctionReturns {
     inline constexpr Error MY_WARNING  = {100, "my favorite warning"};
     inline constexpr Error MY_ERROR  = {-100, "my favorite error"};
 }
 
-// my component class
+// custom component class examples
 class MyModule : public LoggerModule {
     
     public:
