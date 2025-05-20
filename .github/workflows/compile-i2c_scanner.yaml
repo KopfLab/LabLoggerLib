@@ -5,7 +5,7 @@ name: Compile i2c scanner
 on:
   push:
     paths:
-      - src/i2c_scanner
+      - 'src/i2c_scanner/*'
       - .github/workflows/compile.yaml
       - .github/workflows/compile-i2c_scanner.yaml
 

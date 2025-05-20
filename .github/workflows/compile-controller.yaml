@@ -5,7 +5,7 @@ name: Compile controller
 on:
   push:
     paths:
-      - src/controller
+      - 'src/controller/*'
       - LoggerCore/src
       - .github/workflows/compile.yaml
       - .github/workflows/compile-controller.yaml

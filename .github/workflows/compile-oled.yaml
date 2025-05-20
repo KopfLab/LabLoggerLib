@@ -5,7 +5,7 @@ name: Compile oled
 on:
   push:
     paths:
-      - src/oled
+      - 'src/oled/*'
       - .github/workflows/compile.yaml
       - .github/workflows/compile-oled.yaml
 
