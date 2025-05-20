@@ -20,7 +20,7 @@ jobs:
         program:
           - src: 'function'
             lib: ''
-            aux: 'LoggerCore/src/LoggerFunction* LoggerCore/src/LoggerFunctionReturns* LoggerCore/src/LoggerModule*'
+            aux: 'LoggerCore/src/LoggerFunction* LoggerCore/src/LoggerModule*'
         # CHANGE platforms as needed
         platform: 
           - {name: 'p2', version: '6.3.2'}
