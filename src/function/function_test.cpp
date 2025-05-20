@@ -1,3 +1,11 @@
+/**
+ * test for LoggerFunction class
+ * to use:
+ *  - flash to device of joice
+ *  - either call any commands directly with particle call DEVICE test "test4"
+ *  - or start the set of auto-tests by calling particle call DEVICE test "auto_test"
+ */
+
 #include "Particle.h"
 #include "LoggerFunction.h"
 #include "LoggerFunctionReturns.h"
@@ -131,8 +139,6 @@ size_t call_i = 0;
 const std::chrono::milliseconds wait = 2s;
 
 // loop
-// instructions: either call any commands directly with particle call DEVICE test "test4"
-// or start this set of auto-tests by calling particle call DEVICE test "auto_test"
 void loop() {
 
     // mimic commands via the test calls
