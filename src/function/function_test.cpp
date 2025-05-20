@@ -128,7 +128,7 @@ const Vector<String> calls {
 
 unsigned long last_call = 0;
 size_t call_i = 0;
-const std::chrono::milliseconds wait = 1s;
+const std::chrono::milliseconds wait = 2s;
 
 // loop
 // instructions: either call any commands directly with particle call DEVICE test "test4"
@@ -139,8 +139,11 @@ void loop() {
     if (mod->auto_test_running && millis() - last_call > wait.count()) {
         if (call_i >= calls.size()) call_i = 0;
         Log.print("\n");
+        uint32_t mem_before = System.freeMemory();
         Log.info("CALL #%d (free mem: %.3f KB): '%s'", call_i, (float) System.freeMemory() / 1024., calls[call_i].c_str());
         func->receiveCall(String(calls[call_i]));
+        uint32_t mem_after = System.freeMemory();
+        Log.info("FREE MEM loss: %d B", mem_before - mem_after);
         Log.print("\n");
         call_i++;
         last_call = millis();

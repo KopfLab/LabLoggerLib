@@ -103,104 +103,96 @@ int LoggerFunction::receiveCall (String call) {
 
     using namespace LoggerFunctionReturns;
 
-    // store call and basic info in current command Variant, then parse it
-    m_cur_call = Variant();
-    m_cur_call.set("call", call.c_str());
-    m_cur_call.set("dt", Time.format(Time.now(), "%Y-%m-%d %H:%M:%S %Z"));
-    m_cur_call.set("lt", "cmd"); // log type
-    size_t cmd_idx = parseCall(); 
+    // store call and basic info in the Variant and then parse it
+    // important: this is NOT a member variable on purpose because variants
+    // that are modified lead to memory fragmentation
+    Variant parsed;
+    parsed.set("call", call.c_str());
+    parsed.set("dt", Time.format(Time.now(), "%Y-%m-%d %H:%M:%S %Z"));
+    parsed.set("lt", "cmd"); // log type
+    size_t cmd_idx = parseCall(parsed); 
 
     // any issues? 
     if (cmd_idx == PARSING_ERROR) {
 
         // parsing error
-        Log.trace("parsing error: %s", m_cur_call.toJSON().c_str());
-        m_cur_call.set("success", false);
+        Log.trace("parsing error: %s", parsed.toJSON().c_str());
+        parsed.set("success", false);
 
     }  else {
 
         // found a command while parsing, execute the callback
-        Log.trace("execute callback with: %s", m_cur_call.toJSON().c_str());
-        bool success = m_commands[cmd_idx].callback(m_cur_call);
-        m_cur_call.set("success", success);
+        Log.trace("execute callback with: %s", parsed.toJSON().c_str());
+        bool success = m_commands[cmd_idx].callback(parsed);
+        parsed.set("success", success);
 
         // if no ret val set yet
-        if (success && !hasReturnValue(m_cur_call)) {
-            setSuccess(m_cur_call);
-        } else if (!success && !hasReturnValue(m_cur_call)) {
-            setReturnValue(m_cur_call, CALL_ERR_UNKNOWN);
+        if (success && !hasReturnValue(parsed)) {
+            setSuccess(parsed);
+        } else if (!success && !hasReturnValue(parsed)) {
+            setReturnValue(parsed, CALL_ERR_UNKNOWN);
         } 
     }
 
     // report command to cloud if logging is on
     if (m_log) {
         // FIXME: implement
-        // LoggerPublisher::queueData(m_cur_call);
+        // LoggerPublisher::queueData(parsed);
         // this will also print the published data like below instead of here
         Log.trace("after callback:");
-        Log.print(m_cur_call.toJSON().c_str());
+        Log.print(parsed.toJSON().c_str());
         Log.print("\n");
     }
 
     // update last call variable?
     if (m_var_last_calls != nullptr) {
         
-        /*
-         * i think this leads ot memory fragmentation
+        // restore from JSON (stored in char to avoid memory fragmentation)
+        Variant call_log = Variant::fromJSON(m_value_last_calls);
 
         // store the last call in the call log
-        m_call_log.append(m_cur_call);
-        String call_log_json = m_call_log.toJSON();
-        while (call_log_json.length() >= particle::protocol::MAX_FUNCTION_ARG_LENGTH && !m_call_log.isEmpty()) {
+        call_log.append(parsed);
+        size_t call_log_size = call_log.toJSON().length();
+        while (call_log_size  >= particle::protocol::MAX_FUNCTION_ARG_LENGTH && !call_log.isEmpty()) {
             // remove the oldest entries until they fit
-            m_call_log.removeAt(0);
-            call_log_json = m_call_log.toJSON();
+            call_log.removeAt(0);
+            call_log_size = call_log.toJSON().length();
         }
 
-        // set m_call_log
+        // set call_log
         if (Log.isTraceEnabled()) {
-            Log.trace("new value for Particle.variable('%s') from %d commands in call log stack", m_var_last_calls, m_call_log.size());
-            Log.print(call_log_json);
+            Log.trace("new value for Particle.variable('%s') from %d commands in call log stack", m_var_last_calls, call_log.size());
+            Log.print(call_log.toJSON().c_str());
             Log.print("\n");
         }
 
-        // check if call log now fits
-        if (call_log_json.length() < particle::protocol::MAX_FUNCTION_ARG_LENGTH) {
-            // call log now fits into the particle variable
-            snprintf(m_value_last_calls, particle::protocol::MAX_FUNCTION_ARG_LENGTH, "%s", call_log_json.c_str());
-        } else {
-            // call doesn't fit
-            Variant trunc;
-            trunc.set("trunc", true);
-            trunc.set("error", 
-                String::format("call is too long (%d chars) and doesn't fit into the size limit of a particle variable (%d)",
-                    call_log_json.length(), particle::protocol::MAX_FUNCTION_ARG_LENGTH));
-            snprintf(m_value_last_calls, particle::protocol::MAX_FUNCTION_ARG_LENGTH, "%s", trunc.toJSON().c_str());
-        }
-
-        */
+        // assign call log
+        snprintf(m_value_last_calls, particle::protocol::MAX_FUNCTION_ARG_LENGTH, "%s", call_log.toJSON().c_str());
     }
 
     // return return value
-    return(getReturnValue(m_cur_call));
+    return(getReturnValue(parsed));
 }
 
-size_t LoggerFunction::parseCall() {
+size_t LoggerFunction::parseCall(Variant& parsed) {
 
     // logger function returns
     using namespace LoggerFunctionReturns;
     
-    // make a mutable local copy for thread safety
-    char *copy = strdup(m_cur_call.get("call").toString().c_str());
-
-    // empty call?
-    if (copy == nullptr) {
-        setReturnValue(m_cur_call, CALL_ERR_EMPTY);
+    // get call back out
+    String call = parsed.get("call").toString();
+    if (call.length() == 0) {
+        setReturnValue(parsed, CALL_ERR_EMPTY);
         return(PARSING_ERROR);
     }
 
+    // make a mutable local copy for thread safety 
+    // use a smart pointer for memory management
+    auto copy = std::make_unique<char[]>(call.length() + 1);
+    std::strcpy(copy.get(), call.c_str());
+
     // get module
-    char *part = strtok(copy, " ");
+    char *part = strtok(copy.get(), " ");
 
     // module or cmd exists?
     bool mod_found = false;
@@ -209,12 +201,12 @@ size_t LoggerFunction::parseCall() {
     for (size_t i = 0; i < m_commands.size(); ++i) {
         if (!m_commands[i].use) continue;
         if (strcmp(part, m_commands[i].module) == 0) {
-            m_cur_call.set("m", part);
+            parsed.set("m", part);
             mod_found = true;
         }
         if (strcmp(part, m_commands[i].cmd) == 0) {
             Log.trace("cmd match: %s", part);
-            m_cur_call.set("c", part);
+            parsed.set("c", part);
             n_cmds_found++;
             cmd_idx = i;
         }
@@ -226,15 +218,15 @@ size_t LoggerFunction::parseCall() {
         part = strtok(nullptr, " ");
         if (part == nullptr) {
             // no command provided --> error
-            setReturnValue(m_cur_call, CALL_ERR_CMD_MISS);
+            setReturnValue(parsed, CALL_ERR_CMD_MISS);
             return(PARSING_ERROR);
         }
         for (size_t i = 0; i < m_commands.size(); ++i) {
             if (!m_commands[i].use) continue;
-            if (strcmp(m_cur_call.get("m").asString().c_str(), m_commands[i].module) == 0 && strcmp(part, m_commands[i].cmd) == 0) {
+            if (strcmp(parsed.get("m").asString().c_str(), m_commands[i].module) == 0 && strcmp(part, m_commands[i].cmd) == 0) {
                 // found the command
                 Log.trace("cmd match: %s", part);
-                m_cur_call.set("c", part);
+                parsed.set("c", part);
                 n_cmds_found++;
                 cmd_idx = i;
                 break;
@@ -242,19 +234,19 @@ size_t LoggerFunction::parseCall() {
         }
         if (n_cmds_found == 0) {
             // no command of those that are registered for the module fits
-            setReturnValue(m_cur_call, CALL_ERR_CMD_UNREC);
+            setReturnValue(parsed, CALL_ERR_CMD_UNREC);
             return(PARSING_ERROR);
         }
     } else if (!mod_found && n_cmds_found == 1) {
         // all good, found a single command --> set the module accordingly
-        m_cur_call.set("m", m_commands[cmd_idx].module);
+        parsed.set("m", m_commands[cmd_idx].module);
     } else if (!mod_found && n_cmds_found == 0) {
         // was neither a comand nor a module -> error
-        setReturnValue(m_cur_call, CALL_ERR_CMD_MOD_UNREC);
+        setReturnValue(parsed, CALL_ERR_CMD_MOD_UNREC);
         return(PARSING_ERROR);
     } else if (!mod_found && n_cmds_found > 1) {
         // command is ambiguous (might be in multiple modules)
-        setReturnValue(m_cur_call, CALL_ERR_AMBIGUOUS);
+        setReturnValue(parsed, CALL_ERR_AMBIGUOUS);
         return(PARSING_ERROR);
     }
 
@@ -270,14 +262,14 @@ size_t LoggerFunction::parseCall() {
         if (part == nullptr) {
             if (!m_commands[cmd_idx].value_optional) {
                 // no value provided and value is not optional --> error
-                setReturnValue(m_cur_call, CALL_ERR_VAL_MISS);
+                setReturnValue(parsed, CALL_ERR_VAL_MISS);
                 return(PARSING_ERROR);
             }
             // empty value but that's okay
-            m_cur_call.set("vtext", Variant());
+            parsed.set("vtext", Variant());
         } else {
             // got a value!
-            m_cur_call.set("vtext", part);
+            parsed.set("vtext", part);
             bool valid_value = false;
             
             // let's see if it matches any of the allowed text values
@@ -293,7 +285,7 @@ size_t LoggerFunction::parseCall() {
                 // nothing found and numeric values not allowed?
                 if (!valid_value && !m_commands[cmd_idx].allow_numeric_values) {
                     // --> error
-                    setReturnValue(m_cur_call, CALL_ERR_VAL_UNREC);
+                    setReturnValue(parsed, CALL_ERR_VAL_UNREC);
                     return(PARSING_ERROR);
                 }
             }
@@ -308,18 +300,18 @@ size_t LoggerFunction::parseCall() {
 
                 if (num_end == part) {
                     // not a valid number
-                    setReturnValue(m_cur_call, CALL_ERR_VAL_NAN);
+                    setReturnValue(parsed, CALL_ERR_VAL_NAN);
                     return(PARSING_ERROR);
                 } else {
                     // yay number
-                    m_cur_call.set("vnum", number);
-                    Log.trace("numeric value: %s", m_cur_call.get("vnum").toString().c_str());
+                    parsed.set("vnum", number);
+                    Log.trace("numeric value: %s", parsed.get("vnum").toString().c_str());
                 }
 
                 if (*num_end != '\0' && m_commands[cmd_idx].numeric_units.isEmpty()) {
                     // found units directly after the number but none were expected! --> error
-                    m_cur_call.set("u", num_end);
-                    setReturnValue(m_cur_call, CALL_ERR_UNIT_UNEXP);
+                    parsed.set("u", num_end);
+                    setReturnValue(parsed, CALL_ERR_UNIT_UNEXP);
                     return(PARSING_ERROR);
                 }
 
@@ -328,21 +320,21 @@ size_t LoggerFunction::parseCall() {
                     bool valid_units = false;
                     if (*num_end != '\0') {
                         // found units directly after the number
-                        m_cur_call.set("u", num_end);
+                        parsed.set("u", num_end);
                     } else {
                         // fetch next part
                         part = strtok(nullptr, " ");
                         if (part == nullptr) {
-                            setReturnValue(m_cur_call, CALL_ERR_UNIT_MISS);
+                            setReturnValue(parsed, CALL_ERR_UNIT_MISS);
                             return(PARSING_ERROR);
                         }
-                        m_cur_call.set("u", part);
+                        parsed.set("u", part);
                     }
                     // check if the units fit any of the expected
                     for (size_t i = 0; i < m_commands[cmd_idx].numeric_units.size(); ++i) {
-                        if (strcmp(m_cur_call.get("u").asString().c_str(), m_commands[cmd_idx].numeric_units[i].c_str()) == 0) {
+                        if (strcmp(parsed.get("u").asString().c_str(), m_commands[cmd_idx].numeric_units[i].c_str()) == 0) {
                             // found the unit (already correctly assigned "u")
-                            Log.trace("unit match: %s", m_cur_call.get("u").asString().c_str());
+                            Log.trace("unit match: %s", parsed.get("u").asString().c_str());
                             valid_units = true;
                             break;
                         }
@@ -351,7 +343,7 @@ size_t LoggerFunction::parseCall() {
                     // did we find valid units?
                     if (!valid_units) {
                         // no --> units not recognized
-                        setReturnValue(m_cur_call, CALL_ERR_UNIT_UNREC);
+                        setReturnValue(parsed, CALL_ERR_UNIT_UNREC);
                         return(PARSING_ERROR);
                     }
                 }
@@ -376,7 +368,7 @@ size_t LoggerFunction::parseCall() {
                     if (found_param) {
                         // store the previous param in the variant
                         Log.trace("param: %s='%s'", m_params[current_param].c_str(), param_value.c_str());
-                        m_cur_call.set(m_params[current_param].c_str(), param_value.c_str());
+                        parsed.set(m_params[current_param].c_str(), param_value.c_str());
                     }
                     // start the new param
                     found_param = true;
@@ -401,7 +393,7 @@ size_t LoggerFunction::parseCall() {
         if (found_param) {
             // store the previous param in the variant
             Log.trace("param: %s='%s'", m_params[current_param].c_str(), param_value.c_str());
-            m_cur_call.set(m_params[current_param].c_str(), param_value.c_str());
+            parsed.set(m_params[current_param].c_str(), param_value.c_str());
         }
     }
     

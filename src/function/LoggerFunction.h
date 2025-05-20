@@ -32,7 +32,6 @@ class LoggerFunction {
         const char* m_var_available_commands;
         char m_value_available_commands[particle::protocol::MAX_FUNCTION_ARG_LENGTH];
         const char* m_var_last_calls;
-        Variant m_call_log;
         char m_value_last_calls[particle::protocol::MAX_FUNCTION_ARG_LENGTH];
 
         // call parameters (xyz=, abc=) to interpret/capture
@@ -70,19 +69,18 @@ class LoggerFunction {
         };
 
         // vector of commands        
+        // this is a non-const Variant but since it is not modified during runtime (only during startup)
+        // it is not a memory problem
         Vector<Command> m_commands;
-
-        // current/last parsed function call
-        Variant m_cur_call;
 
         // register a full cloud command with a std:function call, used by other registerCommmand... calls
         void registerCommand(const std::function<bool(Variant&)>& cb, const char* module, const char* cmd, 
             const Vector<String>& text_values, bool allow_numeric_values,
             const Vector<String>& numeric_units, bool value_optional);
 
-        // parses the function call and store the results in m_cur_call
+        // parses the function call
         // returns the m_commands index of the command that fits the call (or PARSED_ERROR if parsing error)
-        size_t parseCall();
+        size_t parseCall(Variant& parsed);
 
     public:
 
@@ -121,7 +119,7 @@ class LoggerFunction {
             std::function<bool(Variant&)> cb = [instance, method](Variant& v) {
                 return (instance->*method)(v);
             };
-            Vector<String> empty = {};
+            const Vector<String> empty = {};
             registerCommand(cb, module, cmd, empty, false, empty, false);
         }
 
@@ -135,7 +133,7 @@ class LoggerFunction {
             std::function<bool(Variant&)> cb = [instance, method](Variant& v) {
                 return (instance->*method)(v);
             };
-            Vector<String> empty = {};
+            const Vector<String> empty = {};
             registerCommand(cb, module, cmd, text_values, false, empty, value_optional);
         }
 
@@ -149,7 +147,7 @@ class LoggerFunction {
             std::function<bool(Variant&)> cb = [instance, method](Variant& v) {
                 return (instance->*method)(v);
             };
-            Vector<String> empty = {};
+            const Vector<String> empty = {};
             registerCommand(cb, module, cmd, empty, true, numeric_units, value_optional);
         }
 
