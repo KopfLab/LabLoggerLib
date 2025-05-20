@@ -5,7 +5,7 @@ name: Compile function
 on:
   push:
     paths:
-      - src/function
+      - 'src/function/**'
       - .github/workflows/compile.yaml
       - .github/workflows/compile-function.yaml
 

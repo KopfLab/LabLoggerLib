@@ -25,10 +25,10 @@ The following firmware is included in the repository to provide frequently used 
 
 | Program  | *main* branch | *dev* branch  |
 | :------- | :--- | :--- |
-| blink    | ![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main) | ![blink-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=dev) |
-| i2c_scanner    | ![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=main) | ![blink-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=dev) |
-| publish  | ![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main) | ![publish-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=dev) |
-| function  | ![function](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml/badge.svg?branch=main) | ![function-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/function-publish.yaml/badge.svg?branch=dev) |
+| blink    | ![https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main) | ![https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=dev) |
+| i2c_scanner    | ![https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_sanner.yaml](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=main) | ![https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=dev) |
+| publish  | ![https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main) | ![https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=dev) |
+| function  | ![https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml/badge.svg?branch=main) | ![https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml/badge.svg?branch=dev) |
 
 ### Compile
 
