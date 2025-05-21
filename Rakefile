@@ -17,6 +17,7 @@ task :blink => :compile
 task :publish => :compile
 task :i2c_scanner => :compile
 task :oled => :compile
+task :function => :compile
 
 ### SETUP ###
 

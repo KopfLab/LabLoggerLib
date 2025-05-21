@@ -1,14 +1,14 @@
 # name of the job
-name: Compile controller
+name: Compile function
 
 # specify which paths to watch for changes
 on:
   push:
     paths:
-      - 'src/controller/*'
-      - LoggerCore/src
+      - 'src/function/*'
+      - 'LoggerCore/src/*'
       - .github/workflows/compile.yaml
-      - .github/workflows/compile-controller.yaml
+      - .github/workflows/compile-function.yaml
 
 # run compile via the compile.yaml
 jobs:
@@ -18,9 +18,9 @@ jobs:
       matrix:
         # CHANGE program/lib/aux as needed
         program:
-          - src: 'controller'
-            lib: 'LoggerCore/src DeviceNameHelperRK/src FileHelperRK/src SequentialFileRK/src PublishQueueExtRK/src SparkFun_Qwiic_OpenLog_Arduino_Library/src'
-            aux: ''
+          - src: 'function'
+            lib: ''
+            aux: 'LoggerCore/src/LoggerFunction* LoggerCore/src/LoggerModule*'
         # CHANGE platforms as needed
         platform: 
           - {name: 'p2', version: '6.3.2'}

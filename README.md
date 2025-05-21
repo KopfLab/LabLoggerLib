@@ -1,5 +1,7 @@
-![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main) 
-![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main)
+[![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml)
+[![i2c scanner](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=main)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml)
+[![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml)
+[![function](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml/badge.svg?branch=main)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml)
 
 # LabLoggerLibs
 
@@ -11,7 +13,7 @@ A BibTeX entry for LaTeX users is
 
 ```
 @Manual{
-  microLogger,
+  LabLogger,
   title = {LabLogger: modular data logging for research labs},
   author = {Sebastian Kopf},
   year = {2025},
@@ -25,9 +27,10 @@ The following firmware is included in the repository to provide frequently used 
 
 | Program  | *main* branch | *dev* branch  |
 | :------- | :--- | :--- |
-| blink    | ![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main) | ![blink-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=dev) |
-| i2c_scanner    | ![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=main) | ![blink-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=dev) |
-| publish  | ![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main) | ![publish-dev](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=dev) |
+| blink    | [![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=main)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml) | [![blink](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml/badge.svg?branch=dev)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-blink.yaml) |
+| i2c_scanner    | [![i2c scanner](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=main)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml) | [![i2c scanner](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml/badge.svg?branch=dev)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-i2c_scanner.yaml) |
+| publish  | [![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=main)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml) | [![publish](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml/badge.svg?branch=dev)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-publish.yaml) |
+| function  | [![function](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml/badge.svg?branch=main)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml) | [![function](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml/badge.svg?branch=dev)](https://github.com/KopfLab/LabLoggerLibs/actions/workflows/compile-function.yaml) |
 
 ### Compile
 
@@ -80,7 +83,7 @@ The `LoggerCore` library provides the following functionality.
 
 ## Dependencies
 
-The following third-party software is used in the ***LabLogger*** libraries:
+The following third-party software is used in the ***LabLogger*** libraries. See the linked GitHub repositories for the respective licensing text and license files.
 
 | **Library** | **Dependency**                         | **Website**                                                        | **License** |
 |-------------|----------------------------------------|--------------------------------------------------------------------|-------------|
@@ -90,8 +93,8 @@ The following third-party software is used in the ***LabLogger*** libraries:
 | LoggerCore  | SequentialFileRK                       | https://github.com/rickkas7/SequentialFileRK                       | MIT         |
 | LoggerCore  | PublishQueueExtRK                      | https://github.com/rickkas7/PublishQueueExtRK                      | MIT         |
 | LoggerCore  | SparkFun_Qwiic_OpenLog_Arduino_Library | https://github.com/sparkfun/SparkFun_Qwiic_OpenLog_Arduino_Library | MIT         |
-| LoggerOled  | Adafruit_SSD1306                       | https://github.com/adafruit/Adafruit_SSD1306                       | BSD         |
-| LoggerOled  | Adafruit-GFX-Library                   | https://github.com/adafruit/Adafruit-GFX-Library                   | BSD         |
-| LoggerOled  | Adafruit_BusIO                         | https://github.com/adafruit/Adafruit_BusIO                         | MIT         |
+| LoggerOled  | Adafruit_SSD1306_RK                    | https://github.com/rickkas7/Adafruit_SSD1306_RK                    | BSD         |
+| LoggerOled  | Adafruit_GFX_RK                        | https://github.com/rickkas7/Adafruit_GFX_RK                        | BSD         |
+| LoggerOled  | Adafruit_BusIO                         | https://github.com/rickkas7/Adafruit_BusIO_RK                      | MIT         |
 
 

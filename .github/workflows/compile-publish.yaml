@@ -5,8 +5,8 @@ name: Compile publish
 on:
   push:
     paths:
-      - src/publish
-      - LoggerCore/src
+      - 'src/publish/*'
+      - 'LoggerCore/src/*'
       - .github/workflows/compile.yaml
       - .github/workflows/compile-publish.yaml
 

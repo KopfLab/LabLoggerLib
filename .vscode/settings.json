@@ -74,6 +74,7 @@
         "charconv": "cpp",
         "clocale": "cpp",
         "span": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "deque": "cpp"
     }
 }

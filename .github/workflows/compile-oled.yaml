@@ -1,14 +1,13 @@
 # name of the job
-name: Compile controller
+name: Compile oled
 
 # specify which paths to watch for changes
 on:
   push:
     paths:
-      - 'src/controller/*'
-      - LoggerCore/src
+      - 'src/oled/*'
       - .github/workflows/compile.yaml
-      - .github/workflows/compile-controller.yaml
+      - .github/workflows/compile-oled.yaml
 
 # run compile via the compile.yaml
 jobs:
@@ -18,8 +17,8 @@ jobs:
       matrix:
         # CHANGE program/lib/aux as needed
         program:
-          - src: 'controller'
-            lib: 'LoggerCore/src DeviceNameHelperRK/src FileHelperRK/src SequentialFileRK/src PublishQueueExtRK/src SparkFun_Qwiic_OpenLog_Arduino_Library/src'
+          - src: 'oled'
+            lib: 'Adafruit_SSD1306_RK/src Adafruit_GFX_RK/src Adafruit_BusIO_RK/src'
             aux: ''
         # CHANGE platforms as needed
         platform: 
