@@ -5,7 +5,7 @@ name: Compile i2c scanner
 on:
   push:
     paths:
-      - 'examples/i2c_scanner/*'
+      - examples/i2c_scanner
       - .github/workflows/compile.yaml
       - .github/workflows/compile-i2c_scanner.yaml
 
@@ -15,12 +15,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # CHANGE program/lib/aux as needed
+        # CHANGE program and specify lib/aux and non-default src as needed
         program:
           - name: 'i2s_scanner'
-            src: 'examples/i2c_scanner'
-            lib: ''
-            aux: ''
         # CHANGE platforms as needed
         platform: 
           - {name: 'photon', version: '2.3.1'}
@@ -34,9 +31,9 @@ jobs:
     uses: ./.github/workflows/compile.yaml
     secrets: inherit
     with:
-      program: ${{ matrix.program.name }}
       platform: ${{ matrix.platform.name }}
       version: ${{ matrix.platform.version }}      
-      src: ${{ matrix.program.src }}
-      lib: ${{ matrix.program.lib }}
-      aux: ${{ matrix.program.aux }}
+      program: ${{ matrix.program.name }}
+      src: ${{ matrix.program.src || '' }}
+      lib: ${{ matrix.program.lib || '' }}
+      aux: ${{ matrix.program.aux || '' }}

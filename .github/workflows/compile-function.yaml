@@ -5,8 +5,8 @@ name: Compile function
 on:
   push:
     paths:
-      - 'examples/function/*'
-      - 'LoggerCore/src/*'
+      - examples/function
+      - LoggerCore/src
       - .github/workflows/compile.yaml
       - .github/workflows/compile-function.yaml
 
@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # CHANGE program/lib/aux as needed
+        # CHANGE program and specify lib/aux and non-default src as needed
         program:
           - name: 'function'
             aux: 'LoggerCore/src/LoggerFunction* LoggerCore/src/LoggerModule*'

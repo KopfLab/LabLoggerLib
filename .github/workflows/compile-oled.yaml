@@ -5,7 +5,7 @@ name: Compile oled
 on:
   push:
     paths:
-      - 'examples/oled/*'
+      - examples/oled
       - .github/workflows/compile.yaml
       - .github/workflows/compile-oled.yaml
 
@@ -15,12 +15,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # CHANGE program/lib/aux as needed
+        # CHANGE program and specify lib/aux and non-default src as needed
         program:
           - name: 'oled'
-            src: 'examples/oled'
             lib: 'Adafruit_SSD1306_RK Adafruit_GFX_RK Adafruit_BusIO_RK'
-            aux: ''
         # CHANGE platforms as needed
         platform: 
           - {name: 'p2', version: '6.3.2'}
@@ -32,9 +30,9 @@ jobs:
     uses: ./.github/workflows/compile.yaml
     secrets: inherit
     with:
-      program: ${{ matrix.program.name }}
       platform: ${{ matrix.platform.name }}
       version: ${{ matrix.platform.version }}      
-      src: ${{ matrix.program.src }}
-      lib: ${{ matrix.program.lib }}
-      aux: ${{ matrix.program.aux }}
+      program: ${{ matrix.program.name }}
+      src: ${{ matrix.program.src || '' }}
+      lib: ${{ matrix.program.lib || '' }}
+      aux: ${{ matrix.program.aux || '' }}

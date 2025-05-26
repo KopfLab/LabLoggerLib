@@ -5,7 +5,7 @@ name: Compile blink
 on:
   push:
     paths:
-      - 'examples/blink/*'
+      - examples/blink
       - .github/workflows/compile.yaml
       - .github/workflows/compile-blink.yaml
 
