@@ -87,7 +87,6 @@ The following third-party software is used in the ***LabLogger*** libraries. See
 
 | **Library** | **Dependency**                         | **Website**                                                        | **License** |
 |-------------|----------------------------------------|--------------------------------------------------------------------|-------------|
-| *all*       | Particle firmware                      | https://github.com/particle-iot/device-os                          | LGPL3.0     |
 | LoggerCore  | DeviceNameHelperRK                     | https://github.com/rickkas7/DeviceNameHelperRK                     | MIT         |
 | LoggerCore  | FileHelperRK                           | https://github.com/rickkas7/FileHelperRK                           | MIT         |
 | LoggerCore  | SequentialFileRK                       | https://github.com/rickkas7/SequentialFileRK                       | MIT         |
