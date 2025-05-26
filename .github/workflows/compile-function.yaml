@@ -19,8 +19,6 @@ jobs:
         # CHANGE program/lib/aux as needed
         program:
           - name: 'function'
-            src: 'examples/function'
-            lib: ''
             aux: 'LoggerCore/src/LoggerFunction* LoggerCore/src/LoggerModule*'
         # CHANGE platforms as needed
         platform: 
@@ -33,9 +31,9 @@ jobs:
     uses: ./.github/workflows/compile.yaml
     secrets: inherit
     with:
-      program: ${{ matrix.program.name }}
       platform: ${{ matrix.platform.name }}
       version: ${{ matrix.platform.version }}      
-      src: ${{ matrix.program.src }}
-      lib: ${{ matrix.program.lib }}
-      aux: ${{ matrix.program.aux }}
+      program: ${{ matrix.program.name }}
+      src: ${{ matrix.program.src || '' }}
+      lib: ${{ matrix.program.lib || '' }}
+      aux: ${{ matrix.program.aux || '' }}
