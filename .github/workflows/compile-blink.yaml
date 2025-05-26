@@ -17,7 +17,8 @@ jobs:
       matrix:
         # CHANGE program/lib/aux as needed
         program:
-          - src: 'examples/blink/src'
+          - name: 'blink'
+            src: 'examples/blink'
             lib: ''
             aux: ''
         # CHANGE platforms as needed
@@ -27,14 +28,15 @@ jobs:
           - {name: 'argon', version: '4.2.0'}
 
     # program name
-    name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+    name: ${{ matrix.program.name }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
 
     # workflow call
     uses: ./.github/workflows/compile.yaml
     secrets: inherit
     with:
+      program: ${{ matrix.program.name }}
       platform: ${{ matrix.platform.name }}
-      version: ${{ matrix.platform.version }}
+      version: ${{ matrix.platform.version }}      
       src: ${{ matrix.program.src }}
       lib: ${{ matrix.program.lib }}
       aux: ${{ matrix.program.aux }}
