@@ -1,6 +1,7 @@
 name: Base workflow for compile
 
 env:
+  # default program root and src folders
   DEFAULT_PROGRAM_ROOT: examples/
   DEFAULT_PROGRAM_SRC: /src
 
@@ -51,10 +52,10 @@ jobs:
         id: vars
         run: |
           if [ -z "${{ inputs.src }}" ]; then
-            echo "Assuming it's an example program"
-            echo "program_src=${{ env.DEFAULT_PROGRAM_ROOT }}${{ inputs.src }}${{ env.DEFAULT_PROGRAM_SRC }}" >> $GITHUB_OUTPUT
+            echo "Assuming it's an example program with sources in ${{ env.DEFAULT_PROGRAM_ROOT }}${{ inputs.program }}${{ env.DEFAULT_PROGRAM_SRC }}"
+            echo "program_src=${{ env.DEFAULT_PROGRAM_ROOT }}${{ inputs.program }}${{ env.DEFAULT_PROGRAM_SRC }}" >> $GITHUB_OUTPUT
           else
-            echo "Using provided program source"
+            echo "Using provided program source folder"
             echo "program_src=${{ inputs.src }}" >> $GITHUB_OUTPUT
           fi
 
