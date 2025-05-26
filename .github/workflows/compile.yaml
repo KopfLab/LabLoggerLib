@@ -25,11 +25,16 @@ on:
         required: true
         type: string
         default: ""
-      # optional path(s) to libraries' src folders to be included
+      # optional path(s) to libraries to be included (must be in root or lib/ directory)
       lib:
         required: false
         type: string
         default: ""
+       # optional default sub folder for the source files in libraries
+      lib_sub_folder:
+        required: false
+        type: string
+        default: "/src"
       # optional path(s) to specific resources to include in addition
       aux:
         required: false
