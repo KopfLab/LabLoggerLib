@@ -10,6 +10,7 @@
 #include "LoggerFunction.h"
 #include "LoggerFunctionReturns.h"
 #include "LoggerModule.h"
+#include "LoggerTimer.h"
 
 // enable system treading
 #ifndef SYSTEM_VERSION_v620
@@ -45,7 +46,7 @@ class MyModule : public LoggerModule {
 
         // 'hello'
         void registerHelloCommand(LoggerFunction* func, const char* cmd = "hello") {
-            func->registerCommand(this, &MyModule::hello, getName(), cmd);   
+            func->registerCommand(this, &MyModule::hello, cmd);   
         }
 
         bool hello(Variant& call) {
@@ -56,7 +57,7 @@ class MyModule : public LoggerModule {
 
         // 'whatup'
         void registerWhatupCommand(LoggerFunction* func, const char* cmd = "whatup") {
-            func->registerCommand(this, &MyModule::whatup, getName(), cmd);   
+            func->registerCommand(this, &MyModule::whatup, cmd);   
         }
 
         bool whatup(Variant& call) {
@@ -92,7 +93,7 @@ void setup() {
 
     // register a suite of test commands
     // start auto-test
-    func->registerCommand(mod, &MyModule::auto_test, mod->getName(), "auto-test");
+    func->registerCommand(mod, &MyModule::auto_test, "auto-test");
 
     // register all commands defined in the module class (usually all of them defined there)
     mod->registerHelloCommand(func);
@@ -100,22 +101,22 @@ void setup() {
     mod->registerWhatupCommand(func, "WHATUP");
 
     // simple command
-    func->registerCommand(mod, &MyModule::test, mod->getName(), "test1");
+    func->registerCommand(mod, &MyModule::test, "test1");
 
     // command that accepts on/off values
-    func->registerCommandWithTextValues(mod, &MyModule::test, mod->getName(), "test2", {LoggerFunction::on, LoggerFunction::off});
+    func->registerCommandWithTextValues(mod, &MyModule::test, "test2", {LoggerFunction::on, LoggerFunction::off});
 
     // command that accepts a/b/2 values but providing a value is optional (last param)
-    func->registerCommandWithTextValues(mod, &MyModule::test, mod->getName(), "test3", {"a", "b", "2"}, true);
+    func->registerCommandWithTextValues(mod, &MyModule::test, "test3", {"a", "b", "2"}, true);
 
     // command that accepts numeric values (no units)
-    func->registerCommandWithNumericValues(mod, &MyModule::test, mod->getName(), "test4");
+    func->registerCommandWithNumericValues(mod, &MyModule::test, "test4");
 
     // command that accepts numeric values with specific units, providing the value is optional (last param)
-    func->registerCommandWithNumericValues(mod, &MyModule::test, mod->getName(), "test5", {"sec", "min"}, true);
+    func->registerCommandWithNumericValues(mod, &MyModule::test, "test5", {"sec", "min"}, true);
 
     // command that accepts mixed values with a few specific text values OR numeric values with specific units
-    func->registerCommandWithMixedValues(mod, &MyModule::test, mod->getName(), "test6", {"manual"}, {"ms", "sec"});
+    func->registerCommandWithMixedValues(mod, &MyModule::test, "test6", {"manual"}, {"ms", "sec"});
 
     // start listening to function calls
     func->setup();

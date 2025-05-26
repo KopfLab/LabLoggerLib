@@ -19,10 +19,6 @@ class LoggerModule {
             return(m_name);
         }
 
-        void registerCommands(LoggerFunction* func) {
-
-        };
-
         /**
          * @brief call this while parsing a command to indicate a warning to the user that does not fail the command
          */
