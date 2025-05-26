@@ -18,9 +18,6 @@ jobs:
         # CHANGE program/lib/aux as needed
         program:
           - name: 'blink'
-            src: 'examples/blink'
-            lib: ''
-            aux: ''
         # CHANGE platforms as needed
         platform: 
           - {name: 'p2', version: '6.3.2'}

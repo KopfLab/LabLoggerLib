@@ -1,5 +1,9 @@
 name: Base workflow for compile
 
+env:
+  DEFAULT_PROGRAM_ROOT: examples/
+  DEFAULT_PROGRAM_SRC: /src
+
 on:
   workflow_call:
     inputs:
@@ -15,29 +19,21 @@ on:
       program:
         required: true
         type: string
-      # path to the program folder
+      # optional path to the program's sources, otherwise uses the env defaults to use PROGRAM_ROOT/program/PROGRAM_SRC
       src:
         required: true
         type: string
-      # optional path(s) to libraries to be included
+        default: ""
+      # optional path(s) to libraries' src folders to be included
       lib:
         required: false
         type: string
+        default: ""
       # optional path(s) to specific resources to include in addition
       aux:
         required: false
         type: string
-      # program sub folder name where the src files are kept, default is usually correct
-      src_sub_folder:
-        required: false
-        type: string
-        default: "/src"
-      # libs sub folder name where the src files are kept, default is usually correct
-      lib_sub_folder:
-        required: false
-        type: string
-        default: "/src"
-
+        default: ""
 
 jobs:
   compile:
@@ -51,12 +47,23 @@ jobs:
         with:
           submodules: recursive 
 
+      - name: Determine program sources folder
+        id: vars
+        run: |
+          if [ -z "${{ inputs.src }}" ]; then
+            echo "Assuming it's an example program"
+            echo "program_src=${{ env.DEFAULT_PROGRAM_ROOT }}${{ inputs.src }}${{ env.DEFAULT_PROGRAM_SRC }}" >> $GITHUB_OUTPUT
+          else
+            echo "Using provided program source"
+            echo "program_src=${{ inputs.src }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Gather application sources 
         run: |
           echo "Creating temporary source directory"
           mkdir ${{ inputs.program }}
-          echo "Including sources from ${{ inputs.src }}${{ inputs.src_sub_folder }}"
-          mv ${{ inputs.src }}${{ inputs.src_sub_folder }}/* ${{ inputs.program }} 
+          echo "Including sources from ${{ steps.vars.outputs.program_src }}"
+          mv ${{ steps.vars.outputs.program_src }}/* ${{ inputs.program }} 
           echo "Including libraries:"
           for lib in ${{ inputs.lib }}; do
             if [ -d "$lib${{ inputs.lib_sub_folder }}" ]; then
