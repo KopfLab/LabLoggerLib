@@ -3,28 +3,47 @@ name: Base workflow for compile
 on:
   workflow_call:
     inputs:
+      # name of the particle platform
       platform:
         required: true
         type: string
+      # target version to compile for
       version:
         required: true
         type: string
+      # name of the program
+      program:
+        required: true
+        type: string
+      # path to the program folder
       src:
         required: true
         type: string
+      # optional path(s) to libraries to be included
       lib:
         required: false
         type: string
+      # optional path(s) to specific resources to include in addition
       aux:
         required: false
         type: string
+      # program sub folder name where the src files are kept, default is usually correct
+      src_sub_folder:
+        required: false
+        type: string
+        default: "/src"
+      # libs sub folder name where the src files are kept, default is usually correct
+      lib_sub_folder:
+        required: false
+        type: string
+        default: "/src"
 
 
 jobs:
   compile:
     runs-on: ubuntu-latest
 
-    name: ${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}
+    name: ${{ inputs.program }}-${{ inputs.platform }}-${{ inputs.version }}
     
     steps:
       - name: Checkout code
@@ -35,25 +54,25 @@ jobs:
       - name: Gather application sources 
         run: |
           echo "Creating temporary source directory"
-          mkdir ${{ inputs.src }}
-          echo "Including sources from src/${{ inputs.src }}"
-          mv src/${{ inputs.src }}/* ${{ inputs.src }} 
+          mkdir ${{ inputs.program }}
+          echo "Including sources from ${{ inputs.src }}${{ inputs.src_sub_folder }}"
+          mv ${{ inputs.src }}${{ inputs.src_sub_folder }}/* ${{ inputs.program }} 
           echo "Including libraries:"
           for lib in ${{ inputs.lib }}; do
-            if [ -d "$lib" ]; then
-              echo " - $lib/*"
-              mv $lib/* ${{ inputs.src }}
-            elif [ -d "lib/$lib" ]; then
-              echo " - lib/$lib/*"
-              mv lib/$lib/* ${{ inputs.src }}
+            if [ -d "$lib${{ inputs.lib_sub_folder }}" ]; then
+              echo " - $lib${{ inputs.lib_sub_folder }}/*"
+              mv $lib${{ inputs.lib_sub_folder }}/* ${{ inputs.program }}
+            elif [ -d "lib/$lib${{ inputs.lib_sub_folder }}" ]; then
+              echo " - lib/$lib${{ inputs.lib_sub_folder }}/*"
+              mv lib/$lib${{ inputs.lib_sub_folder }}/* ${{ inputs.program }}
             else
-              echo " - could not find $lib, make sure the folder exists"
+              echo " - could not find $lib${{ inputs.lib_sub_folder }}, make sure the folder exists"
             fi
           done
           echo "Including auxiliary resources:"
           for aux in ${{ inputs.aux }}; do
             echo " - $aux"
-            mv $aux ${{ inputs.src }}
+            mv $aux ${{ inputs.program }}
           done
 
       - name: Compile in cloud (on master)
@@ -64,12 +83,12 @@ jobs:
           particle-access-token: ${{ secrets.PARTICLE_ACCESS_TOKEN }}
           particle-platform-name: ${{ inputs.platform }}
           device-os-version: ${{ inputs.version }}
-          sources-folder: ${{ inputs.src }}
+          sources-folder: ${{ inputs.program }}
 
       - name: Move cloud binary
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          mv ${{ steps.compile.outputs.firmware-path }} ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
+          mv ${{ steps.compile.outputs.firmware-path }} ${{ inputs.program }}/${{ inputs.program }}-${{ inputs.platform }}-${{ inputs.version }}.bin
 
       - name: Compile locally # if not on master or if cloud compile failed
         if: ${{ failure() || github.ref != 'refs/heads/master' }}
@@ -78,15 +97,15 @@ jobs:
         with:
           particle-platform-name: ${{ inputs.platform }}
           device-os-version: ${{ inputs.version }}
-          sources-folder: ${{ inputs.src }}
+          sources-folder: ${{ inputs.program }}
 
       - name: Move local binary
         if: ${{ github.ref != 'refs/heads/master' }}
         run: |
-          mv ${{ steps.localcompile.outputs.firmware-path }} ${{ inputs.src }}/${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}.bin
+          mv ${{ steps.localcompile.outputs.firmware-path }} ${{ inputs.program }}/${{ inputs.program }}-${{ inputs.platform }}-${{ inputs.version }}.bin
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.src }}-${{ inputs.platform }}-${{ inputs.version }}
-          path: ${{ inputs.src }}
+          name: ${{ inputs.program }}-${{ inputs.platform }}-${{ inputs.version }}
+          path: ${{ inputs.program }}

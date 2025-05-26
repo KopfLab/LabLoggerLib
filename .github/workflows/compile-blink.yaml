@@ -5,7 +5,7 @@ name: Compile blink
 on:
   push:
     paths:
-      - 'src/blink/*'
+      - 'examples/blink/*'
       - .github/workflows/compile.yaml
       - .github/workflows/compile-blink.yaml
 
@@ -17,8 +17,8 @@ jobs:
       matrix:
         # CHANGE program/lib/aux as needed
         program:
-          - src: 'blink'
-            lib: 'DeviceNameHelperRK/src MyLib/src'
+          - src: 'examples/blink/src'
+            lib: ''
             aux: ''
         # CHANGE platforms as needed
         platform: 
