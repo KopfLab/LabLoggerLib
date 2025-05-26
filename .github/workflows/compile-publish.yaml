@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # CHANGE program/lib/aux as needed
+        # CHANGE program and specify lib/aux and non-default src as needed
         program:
           - name: 'publish'
             src: 'examples/publish'
@@ -33,9 +33,9 @@ jobs:
     uses: ./.github/workflows/compile.yaml
     secrets: inherit
     with:
-      program: ${{ matrix.program.name }}
       platform: ${{ matrix.platform.name }}
       version: ${{ matrix.platform.version }}      
-      src: ${{ matrix.program.src }}
-      lib: ${{ matrix.program.lib }}
-      aux: ${{ matrix.program.aux }}
+      program: ${{ matrix.program.name }}
+      src: ${{ matrix.program.src || '' }}
+      lib: ${{ matrix.program.lib || '' }}
+      aux: ${{ matrix.program.aux || '' }}
