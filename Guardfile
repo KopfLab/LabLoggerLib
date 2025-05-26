@@ -9,7 +9,6 @@
 require 'yaml'
 
 # constants
-src_folder = "src"
 bin_folder = "bin"
 
 # program
