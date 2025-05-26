@@ -1,6 +1,7 @@
 #pragma once
 #include "Particle.h"
 #include "LoggerFunctionReturns.h"
+#include "LoggerModule.h"
 
 /**
  * extension of return codes
@@ -115,12 +116,17 @@ class LoggerFunction {
          */
         template <typename T>
         // defined here instead of in cpp for full flexibility
-        void registerCommand(T* instance, bool (T::*method)(Variant&), const char* module, const char* cmd) {
+        void registerCommand(T* instance, bool (T::*method)(Variant&), const char* cmd) {
             std::function<bool(Variant&)> cb = [instance, method](Variant& v) {
                 return (instance->*method)(v);
             };
             const Vector<String> empty = {};
-            registerCommand(cb, module, cmd, empty, false, empty, false);
+            if constexpr (std::is_convertible_v<T*, LoggerModule*>) {
+                LoggerModule* m = static_cast<LoggerModule*>(instance); 
+                registerCommand(cb, m->getName(), cmd, empty, false, empty, false);
+            } else {
+                registerCommand(cb, "", cmd, empty, false, empty, false);
+            }
         }
 
         /**
@@ -129,12 +135,17 @@ class LoggerFunction {
          */
         template <typename T>
         // defined here instead of in cpp for full flexibility
-        void registerCommandWithTextValues(T* instance, bool (T::*method)(Variant&), const char* module, const char* cmd, const Vector<String>& text_values, bool value_optional = false) {
+        void registerCommandWithTextValues(T* instance, bool (T::*method)(Variant&), const char* cmd, const Vector<String>& text_values, bool value_optional = false) {
             std::function<bool(Variant&)> cb = [instance, method](Variant& v) {
                 return (instance->*method)(v);
             };
             const Vector<String> empty = {};
-            registerCommand(cb, module, cmd, text_values, false, empty, value_optional);
+            if constexpr (std::is_convertible_v<T*, LoggerModule*>) {
+                LoggerModule* m = static_cast<LoggerModule*>(instance); 
+                registerCommand(cb, m->getName(), cmd, text_values, false, empty, value_optional);
+            } else {
+                registerCommand(cb, "", cmd, text_values, false, empty, value_optional);
+            }
         }
 
         /**
@@ -143,12 +154,17 @@ class LoggerFunction {
          */
         template <typename T>
         // defined here instead of in cpp for full flexibility
-        void registerCommandWithNumericValues(T* instance, bool (T::*method)(Variant&), const char* module, const char* cmd, const Vector<String>& numeric_units = {}, bool value_optional = false) {
+        void registerCommandWithNumericValues(T* instance, bool (T::*method)(Variant&), const char* cmd, const Vector<String>& numeric_units = {}, bool value_optional = false) {
             std::function<bool(Variant&)> cb = [instance, method](Variant& v) {
                 return (instance->*method)(v);
             };
             const Vector<String> empty = {};
-            registerCommand(cb, module, cmd, empty, true, numeric_units, value_optional);
+            if constexpr (std::is_convertible_v<T*, LoggerModule*>) {
+                LoggerModule* m = static_cast<LoggerModule*>(instance); 
+                registerCommand(cb, m->getName(), cmd, empty, true, numeric_units, value_optional);
+            } else {
+                registerCommand(cb, "", cmd, empty, true, numeric_units, value_optional);
+            }
         }
 
          /**
@@ -157,11 +173,16 @@ class LoggerFunction {
          */
         template <typename T>
         // defined here instead of in cpp for full flexibility
-        void registerCommandWithMixedValues(T* instance, bool (T::*method)(Variant&), const char* module, const char* cmd, const Vector<String>& text_values, const Vector<String>& numeric_units = {}, bool value_optional = false) {
+        void registerCommandWithMixedValues(T* instance, bool (T::*method)(Variant&), const char* cmd, const Vector<String>& text_values, const Vector<String>& numeric_units = {}, bool value_optional = false) {
             std::function<bool(Variant&)> cb = [instance, method](Variant& v) {
                 return (instance->*method)(v);
             };
-            registerCommand(cb, module, cmd, text_values, true, numeric_units, value_optional);
+            if constexpr (std::is_convertible_v<T*, LoggerModule*>) {
+                LoggerModule* m = static_cast<LoggerModule*>(instance); 
+                registerCommand(cb, m->getName(), cmd, text_values, true, numeric_units, value_optional);
+            } else {
+                registerCommand(cb, "", cmd, text_values, true, numeric_units, value_optional);
+            }
         }
 
         /**

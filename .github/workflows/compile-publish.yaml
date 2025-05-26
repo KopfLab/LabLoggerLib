@@ -5,8 +5,8 @@ name: Compile publish
 on:
   push:
     paths:
-      - 'src/publish/*'
-      - 'LoggerCore/src/*'
+      - examples/publish
+      - LoggerCore/src
       - .github/workflows/compile.yaml
       - .github/workflows/compile-publish.yaml
 
@@ -16,24 +16,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # CHANGE program/lib/aux as needed
+        # CHANGE program and specify lib/aux and non-default src as needed
         program:
-          - src: 'publish'
-            lib: 'DeviceNameHelperRK/src FileHelperRK/src SequentialFileRK/src PublishQueueExtRK/src SparkFun_Qwiic_OpenLog_Arduino_Library/src'
+          - name: 'publish'
+            src: 'examples/publish'
+            lib: 'DeviceNameHelperRK FileHelperRK SequentialFileRK PublishQueueExtRK SparkFun_Qwiic_OpenLog_Arduino_Library'
             aux: 'LoggerCore/src/LoggerPlatform* LoggerCore/src/LoggerUtils* LoggerCore/src/LoggerPublisher* LoggerCore/src/LoggerSD*'
         # CHANGE platforms as needed
         platform: 
           - {name: 'p2', version: '6.3.2'}
 
     # program name
-    name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+    name: ${{ matrix.program.name }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
 
     # workflow call
     uses: ./.github/workflows/compile.yaml
     secrets: inherit
     with:
       platform: ${{ matrix.platform.name }}
-      version: ${{ matrix.platform.version }}
-      src: ${{ matrix.program.src }}
-      lib: ${{ matrix.program.lib }}
-      aux: ${{ matrix.program.aux }}
+      version: ${{ matrix.platform.version }}      
+      program: ${{ matrix.program.name }}
+      src: ${{ matrix.program.src || '' }}
+      lib: ${{ matrix.program.lib || '' }}
+      aux: ${{ matrix.program.aux || '' }}

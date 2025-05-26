@@ -36,7 +36,7 @@ The following firmware is included in the repository to provide frequently used 
 
 To generate binaries for these programs:
 
- - clone this repository and all submodules (`git clone --recurse-submodules https://github.com/KopfLab/LabLoggerLibs`, see [dependencies](DEPENDENCIES.md) for details)
+ - clone this repository and all submodules (`git clone --recurse-submodules https://github.com/KopfLab/LabLoggerLibs`, see [dependencies](#dependencies) for details)
  - install the [Particle Cloud command line interface (CLI)](https://github.com/spark/particle-cli)
  - log into your account with `particle login`
  - install ruby gems with `bundle install`
@@ -87,7 +87,6 @@ The following third-party software is used in the ***LabLogger*** libraries. See
 
 | **Library** | **Dependency**                         | **Website**                                                        | **License** |
 |-------------|----------------------------------------|--------------------------------------------------------------------|-------------|
-| *all*       | Particle firmware                      | https://github.com/particle-iot/device-os                          | LGPL3.0     |
 | LoggerCore  | DeviceNameHelperRK                     | https://github.com/rickkas7/DeviceNameHelperRK                     | MIT         |
 | LoggerCore  | FileHelperRK                           | https://github.com/rickkas7/FileHelperRK                           | MIT         |
 | LoggerCore  | SequentialFileRK                       | https://github.com/rickkas7/SequentialFileRK                       | MIT         |

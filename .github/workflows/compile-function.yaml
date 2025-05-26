@@ -5,8 +5,8 @@ name: Compile function
 on:
   push:
     paths:
-      - 'src/function/*'
-      - 'LoggerCore/src/*'
+      - examples/function
+      - LoggerCore/src
       - .github/workflows/compile.yaml
       - .github/workflows/compile-function.yaml
 
@@ -16,24 +16,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # CHANGE program/lib/aux as needed
+        # CHANGE program and specify lib/aux and non-default src as needed
         program:
-          - src: 'function'
-            lib: ''
+          - name: 'function'
             aux: 'LoggerCore/src/LoggerFunction* LoggerCore/src/LoggerModule*'
         # CHANGE platforms as needed
         platform: 
           - {name: 'p2', version: '6.3.2'}
 
     # program name
-    name: ${{ matrix.program.src }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+    name: ${{ matrix.program.name }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
 
     # workflow call
     uses: ./.github/workflows/compile.yaml
     secrets: inherit
     with:
       platform: ${{ matrix.platform.name }}
-      version: ${{ matrix.platform.version }}
-      src: ${{ matrix.program.src }}
-      lib: ${{ matrix.program.lib }}
-      aux: ${{ matrix.program.aux }}
+      version: ${{ matrix.platform.version }}      
+      program: ${{ matrix.program.name }}
+      src: ${{ matrix.program.src || '' }}
+      lib: ${{ matrix.program.lib || '' }}
+      aux: ${{ matrix.program.aux || '' }}

@@ -11,7 +11,7 @@
 # to compile & flash: rake x flash
 # to compile, flash & monitor: rake x flash monitor
 
-### PROGRAMS ###
+### EXAMPE PROGRAMS ###
 
 task :blink => :compile
 task :publish => :compile
@@ -35,9 +35,10 @@ versions = {
 }
 
 # constants
-src_folder = "src"
-lib_folder = "lib"
-bin_folder = "bin"
+examples_folder = "examples/"
+lib_folder = "lib/"
+bin_folder = "bin/"
+src_folder = "/src"
 
 # parameters
 platform = ENV['PLATFORM'] || 'p2'
@@ -66,8 +67,8 @@ task :compile do
   # paths
   workflow_path = File.join(".github", "workflows", "compile-#{program}.yaml")
   unless File.exist?(workflow_path)
-    warn "Workflow YAML config file not found, compiling just with source folder: #{workflow_path}"
-    src_path = program
+    warn "Workflow YAML config file (#{workflow_path}) not found, compiling just from examples folder: "
+    src_path = "#{examples_folder}#{program}#{src_folder}"
     lib_path = ""
     aux_files = ""
   else
@@ -77,12 +78,11 @@ task :compile do
     lib_path = paths["lib"]
     aux_files = paths["aux"]
     if src_path.nil? || src_path.strip.empty?
-      raise "Error: could not extract src/lib/aux dependencies from #{workflow_path}"
+      src_path = "#{examples_folder}#{program}#{src_folder}"
     end 
   end
   
   # source
-  src_path = File.join(src_folder, src_path)
   unless Dir.exist?(src_path)
     raise "Error: folder '#{src_path}' does not exist."
   end
@@ -91,10 +91,10 @@ task :compile do
   # libs
   unless lib_path.nil? || lib_path.strip.empty?
     paths = lib_path.strip.split(/\s+/).map do |path|
-      if Dir.exist?(path)
-        path
-      elsif Dir.exists?(File.join(lib_folder, path)) 
-        File.join(lib_folder, path)
+      if Dir.exist?(File.join(path, src_folder)) 
+        File.join(path, src_folder)
+      elsif Dir.exists?(File.join(lib_folder, path, src_folder)) 
+        File.join(lib_folder, path, src_folder)
       else
         raise "Could not find '#{path}' library in root or #{lib_folder} - make sure it exists"
       end
@@ -103,18 +103,23 @@ task :compile do
     lib_files = paths.map do |path|
       Dir.glob("#{path}/**/*.{h,c,cpp}").join(' ')
     end
-    lib_files = lib_files.join(' ')
+    lib_files = " " + lib_files.join(' ')
+  end
+
+  # aux files
+  unless aux_files.nil? || aux_files.strip.empty?
+    aux_files = " " + aux_files
   end
 
   # info
-  puts "\nINFO: compiling '#{program}' in the cloud for #{platform} #{version}...."
+  puts "\nINFO: compiling '#{program}' in the cloud for #{platform} #{version}"
   puts " - src path: #{src_path}"
   puts " - lib paths: #{lib_path}"
   puts " - aux files: #{aux_files}"
   puts "\n"
   
   # compile
-  sh "particle compile #{platform} #{src_files} #{lib_files} #{aux_files} --target #{version} --saveTo #{bin_folder}/#{program}-#{platform}-#{version}.bin", verbose: false
+  sh "particle compile #{platform} #{src_files}#{lib_files}#{aux_files} --target #{version} --saveTo #{bin_folder}#{program}-#{platform}-#{version}.bin", verbose: false
 end
 
 ### FLASH ###
@@ -125,10 +130,10 @@ task :flash do
   # is a binary selected?
   unless bin.nil? || bin.strip.empty?
     # user provided
-    bin_path = File.join(bin_folder, bin)
+    bin_path = "#{bin_folder}#{bin}"
   else
     # find latest
-    files = Dir.glob(File.join(bin_folder, '*.bin')).select { |f| File.file?(f) }
+    files = Dir.glob("#{bin_folder}*.bin").select { |f| File.file?(f) }
     if files.empty?
       raise "No .bin files found in #{bin_folder}"
     end
